@@ -2,4 +2,14 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="app_background">#F6F6F8</color>
+    <color name="text_primary">#1C1C1E</color>
+    <color name="text_secondary">#8E8E93</color>
+    <color name="accent_red">#FF6B6B</color>
+    <color name="accent_orange">#FF9F43</color>
+    <color name="accent_yellow">#FFC048</color>
+    <color name="accent_blue">#4D8DFF</color>
+    <color name="divider_light">#E5E5EA</color>
+    <color name="segment_background">#E9E9EE</color>
+    <color name="pill_background">#F1F1F5</color>
 </resources>
