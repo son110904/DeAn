@@ -21,7 +21,7 @@ public class ForecastActivity extends AppCompatActivity {
         tvForecast = findViewById(R.id.tvForecast);
         bottomNav = findViewById(R.id.bottomNav);
 
-        tvForecast.setText("Chi tiêu dự đoán tháng tới: 6.200.000đ");
+        tvForecast.setText("6.200.000đ");
 
         // Đánh dấu tab hiện tại
         bottomNav.setSelectedItemId(R.id.menu_forecast);
@@ -36,6 +36,7 @@ public class ForecastActivity extends AppCompatActivity {
                 return true;
 
             } else if (id == R.id.menu_add) {
+                startActivity(new Intent(this, AddTransactionActivity.class));
                 return true;
 
             } else if (id == R.id.menu_stats) {
@@ -43,7 +44,6 @@ public class ForecastActivity extends AppCompatActivity {
                 return true;
 
             } else if (id == R.id.menu_forecast) {
-                startActivity(new Intent(this, ForecastActivity.class));
                 return true;
             }
 

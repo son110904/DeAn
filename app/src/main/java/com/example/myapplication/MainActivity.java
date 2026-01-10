@@ -2,13 +2,10 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import android.view.MenuItem;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -41,10 +38,10 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.menu_home) {
-                startActivity(new Intent(this, MainActivity.class));
                 return true;
 
             } else if (id == R.id.menu_add) {
+                startActivity(new Intent(this, AddTransactionActivity.class));
                 return true;
 
             } else if (id == R.id.menu_stats) {
