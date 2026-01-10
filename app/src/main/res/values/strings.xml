@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="title_main">Tổng quan tài chính</string>
+    <string name="total_income">Tổng thu: %1$dđ</string>
+    <string name="total_expense">Tổng chi: %1$dđ</string>
+    <string name="balance">Số dư: %1$dđ</string>
+    <string name="expense_chart_title">Biểu đồ chi tiêu</string>
+    <string name="title_add_transaction">Thêm giao dịch</string>
+    <string name="hint_amount">Nhập số tiền</string>
+    <string name="income">Thu</string>
+    <string name="expense">Chi</string>
+    <string name="save_transaction">Lưu giao dịch</string>
+    <string name="error_missing_info">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="transaction_saved">Đã lưu: %1$s - %2$sđ</string>
+    <string name="title_statistics">Thống kê chi tiêu</string>
+    <string name="chart_category_title">Danh mục chi tiêu</string>
+    <string name="food">Ăn uống</string>
+    <string name="transport">Di chuyển</string>
+    <string name="other">Khác</string>
+    <string name="title_forecast">Dự đoán chi tiêu</string>
+    <string name="forecast_description">
+        Hệ thống sử dụng mô hình học máy để phân tích dữ liệu chi tiêu trong quá khứ,
+        từ đó dự đoán tổng chi tiêu cho tháng tiếp theo.
+    </string>
+    <string name="forecast_result">Chi tiêu dự đoán tháng tới: 6.200.000đ</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_add">Thêm</string>
+    <string name="nav_stats">Thống kê</string>
+    <string name="nav_forecast">Dự đoán</string>
+</resources>
