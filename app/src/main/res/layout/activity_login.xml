@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Quản lý thu chi &amp; dự báo tài chính"
+            android:text="Quản lý thu chi & dự báo tài chính"
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
