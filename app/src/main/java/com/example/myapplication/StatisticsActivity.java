@@ -53,10 +53,10 @@ public class StatisticsActivity extends AppCompatActivity {
                 return true;
 
             } else if (id == R.id.menu_add) {
+                startActivity(new Intent(this, AddTransactionActivity.class));
                 return true;
 
             } else if (id == R.id.menu_stats) {
-                startActivity(new Intent(this, StatisticsActivity.class));
                 return true;
 
             } else if (id == R.id.menu_forecast) {
