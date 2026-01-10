@@ -64,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
         int balance = income - expense;
 
         // Hiển thị text
-        tvIncome.setText("Tổng thu: " + income + "đ");
-        tvExpense.setText("Tổng chi: " + expense + "đ");
-        tvBalance.setText("Số dư: " + balance + "đ");
+        tvIncome.setText(income + "đ");
+        tvExpense.setText(expense + "đ");
+        tvBalance.setText(balance + "đ");
 
         // Load biểu đồ
         setupBarChart();
