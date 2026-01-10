@@ -248,7 +248,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="🍜 Chi tiêu ăn uống • Tài khoản ngân hàng"
+                    android:text="🍜 Ăn cơm sườn • Tài khoản ngân hàng"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
@@ -282,7 +282,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="🍲 Chi tiêu sinh hoạt • Tài khoản ngân hàng"
+                    android:text="🍲 Ăn Gimbab • Tài khoản ngân hàng"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
