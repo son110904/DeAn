@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,6 +34,11 @@ public class StatisticsActivity extends AppCompatActivity {
         entries.add(new PieEntry(30f, "Khác"));
 
         PieDataSet dataSet = new PieDataSet(entries, "Danh mục chi tiêu");
+        dataSet.setColors(
+            Color.parseColor("#5B8FF9"),
+            Color.parseColor("#61DDAA"),
+            Color.parseColor("#F6BD16")
+        );
         PieData data = new PieData(dataSet);
 
         pieChart.setData(data);
