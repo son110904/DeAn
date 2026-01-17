@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -76,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
         entries.add(new BarEntry(3, 1500000)); // Tháng 3
 
         BarDataSet dataSet = new BarDataSet(entries, "Chi tiêu theo tháng");
+        dataSet.setColors(
+            Color.parseColor("#FF6B6B"),
+            Color.parseColor("#4ECDC4"),
+            Color.parseColor("#FFD166")
+        );
         dataSet.setValueTextSize(12f);
 
         BarData barData = new BarData(dataSet);

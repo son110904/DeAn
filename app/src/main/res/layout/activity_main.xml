@@ -46,12 +46,6 @@
                     android:contentDescription="Yêu thích"
                     android:src="@android:drawable/btn_star_big_off" />
 
-                <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="Bộ lọc"
-                    android:src="@android:drawable/ic_menu_manage" />
             </LinearLayout>
 
             <LinearLayout
