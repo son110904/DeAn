@@ -28,9 +28,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         bottomNav = findViewById(R.id.bottomNav);
 
-        // Đánh dấu tab hiện tại
-        bottomNav.setSelectedItemId(R.id.menu_add);
-
         // Xử lý điều hướng
         bottomNav.setOnItemSelectedListener(item -> {
 
@@ -38,9 +35,6 @@ public class AddTransactionActivity extends AppCompatActivity {
 
             if (id == R.id.menu_home) {
                 startActivity(new Intent(this, MainActivity.class));
-                return true;
-
-            } else if (id == R.id.menu_add) {
                 return true;
 
             } else if (id == R.id.menu_stats) {

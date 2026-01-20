@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
+    TextView tabMonth;
+    FloatingActionButton fabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         tvExpense = findViewById(R.id.tvExpense);
         tvBalance = findViewById(R.id.tvBalance);
         barChart = findViewById(R.id.barChart);
+        tabMonth = findViewById(R.id.tabMonth);
+        fabAdd = findViewById(R.id.fabAdd);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -44,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.menu_home) {
-                return true;
-
-            } else if (id == R.id.menu_add) {
-                startActivity(new Intent(this, AddTransactionActivity.class));
                 return true;
 
             } else if (id == R.id.menu_stats) {
@@ -61,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+
+        tabMonth.setOnClickListener(v ->
+            startActivity(new Intent(this, MonthActivity.class))
+        );
+
+        fabAdd.setOnClickListener(v ->
+            startActivity(new Intent(this, AddTransactionActivity.class))
+        );
         updateSummaryAndChart();
     }
 

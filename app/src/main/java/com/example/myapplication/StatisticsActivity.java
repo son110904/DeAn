@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.graphics.Color;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,6 +14,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -22,6 +25,10 @@ public class StatisticsActivity extends AppCompatActivity {
 
     PieChart pieChart;
     BottomNavigationView bottomNav;
+    TextView tvStatsIncome;
+    TextView tvStatsExpense;
+    TextView tvStatsEmpty;
+    FloatingActionButton fabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +37,10 @@ public class StatisticsActivity extends AppCompatActivity {
 
         pieChart = findViewById(R.id.pieChart);
         bottomNav = findViewById(R.id.bottomNav);
+        tvStatsIncome = findViewById(R.id.tvStatsIncome);
+        tvStatsExpense = findViewById(R.id.tvStatsExpense);
+        tvStatsEmpty = findViewById(R.id.tvStatsEmpty);
+        fabAdd = findViewById(R.id.fabAdd);
 
         updatePieChart();
 
@@ -45,10 +56,6 @@ public class StatisticsActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
 
-            } else if (id == R.id.menu_add) {
-                startActivity(new Intent(this, AddTransactionActivity.class));
-                return true;
-
             } else if (id == R.id.menu_stats) {
                 return true;
 
@@ -59,6 +66,10 @@ public class StatisticsActivity extends AppCompatActivity {
 
             return false;
         });
+
+        fabAdd.setOnClickListener(v ->
+            startActivity(new Intent(this, AddTransactionActivity.class))
+        );
     }
 
     @Override
@@ -71,6 +82,9 @@ public class StatisticsActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         long income = prefs.getLong(KEY_INCOME_TOTAL, 0);
         long expense = prefs.getLong(KEY_EXPENSE_TOTAL, 0);
+
+        tvStatsIncome.setText(income + "đ");
+        tvStatsExpense.setText(expense + "đ");
 
         ArrayList<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry(income, "Thu nhập"));
@@ -87,5 +101,8 @@ public class StatisticsActivity extends AppCompatActivity {
         pieChart.getDescription().setEnabled(false);
         pieChart.animateY(1000);
         pieChart.invalidate();
+
+        boolean hasData = income > 0 || expense > 0;
+        tvStatsEmpty.setVisibility(hasData ? View.GONE : View.VISIBLE);
     }
 }
