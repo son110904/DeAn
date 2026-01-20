@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.graphics.Color;
@@ -17,6 +18,10 @@ import com.example.myapplication.R;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String PREFS_NAME = "finance_prefs";
+    private static final String KEY_INCOME_TOTAL = "income_total";
+    private static final String KEY_EXPENSE_TOTAL = "expense_total";
+
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
 
@@ -56,27 +61,34 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
-        // Dữ liệu giả
-        int income = 10000000;
-        int expense = 5000000;
-        int balance = income - expense;
+        updateSummaryAndChart();
+    }
 
-        // Hiển thị text
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateSummaryAndChart();
+    }
+
+    private void updateSummaryAndChart() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        long income = prefs.getLong(KEY_INCOME_TOTAL, 0);
+        long expense = prefs.getLong(KEY_EXPENSE_TOTAL, 0);
+        long balance = income - expense;
+
         tvIncome.setText(income + "đ");
         tvExpense.setText(expense + "đ");
         tvBalance.setText(balance + "đ");
 
-        // Load biểu đồ
-        setupBarChart();
+        setupBarChart(income, expense);
     }
 
-    private void setupBarChart() {
+    private void setupBarChart(long income, long expense) {
         ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(1, 2000000)); // Tháng 1
-        entries.add(new BarEntry(2, 3500000)); // Tháng 2
-        entries.add(new BarEntry(3, 1500000)); // Tháng 3
+        entries.add(new BarEntry(1, income));
+        entries.add(new BarEntry(2, expense));
 
-        BarDataSet dataSet = new BarDataSet(entries, "Chi tiêu theo tháng");
+        BarDataSet dataSet = new BarDataSet(entries, "Thu/Chi");
         dataSet.setColors(
             Color.parseColor("#FF6B6B"),
             Color.parseColor("#4ECDC4"),
