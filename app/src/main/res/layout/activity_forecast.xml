@@ -8,55 +8,50 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav"
-        android:padding="16dp">
+        android:layout_above="@id/bottomNav">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Dự đoán xu hướng"
-                    android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                android:background="@color/card_background"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_pill"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="Tháng ▾"
+                    android:text="Forecast"
                     android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Ứng dụng sử dụng mô hình SARIMA để dự đoán thu nhập và chi tiêu trong tương lai theo quy trình CRISP-ML."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="4dp" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Ứng dụng sử dụng mô hình SARIMA để dự đoán thu nhập và chi tiêu trong tương lai theo quy trình CRISP-ML."
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
-
+            <!-- Forecast Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@color/white"
+                android:layout_margin="20dp"
+                android:background="@drawable/bg_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -69,45 +64,136 @@
                     android:id="@+id/tvForecast"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:text="6.200.000đ"
                     android:textColor="@color/text_primary"
-                    android:textSize="28sp"
+                    android:textSize="36sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Xu hướng tăng 8% so với tháng trước"
-                    android:textColor="@color/accent_red"
-                    android:textSize="13sp" />
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_pill"
+                    android:backgroundTint="#FFF3F3"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="↑"
+                        android:textColor="@color/accent_red"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Xu hướng tăng 8% so với tháng trước"
+                        android:textColor="@color/accent_red"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
 
+            <!-- Model Info Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@color/white"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nguồn dữ liệu"
                     android:textColor="@color/text_primary"
-                    android:textSize="15sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="FastAPI + PostgreSQL/TimescaleDB • MPAndroidChart • Retrofit + JSON"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_pill"
+                            android:backgroundTint="@color/primary_blue" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="FastAPI + PostgreSQL/TimescaleDB"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_pill"
+                            android:backgroundTint="@color/primary_blue" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="MPAndroidChart"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_pill"
+                            android:backgroundTint="@color/primary_blue" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Retrofit + JSON"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
         </LinearLayout>
     </ScrollView>
 
@@ -116,18 +202,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@color/card_background"
+        android:elevation="8dp"
+        app:itemIconTint="@color/primary_blue"
+        app:itemTextColor="@color/text_secondary"
         app:menu="@menu/bottom_menu" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="88dp"
-        android:contentDescription="Thêm giao dịch"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/accent_orange"
-        app:tint="@color/white" />
 </RelativeLayout>

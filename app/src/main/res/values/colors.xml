@@ -2,14 +2,32 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="app_background">#F6F6F8</color>
-    <color name="text_primary">#1C1C1E</color>
-    <color name="text_secondary">#8E8E93</color>
-    <color name="accent_red">#FF6B6B</color>
-    <color name="accent_orange">#FF9F43</color>
-    <color name="accent_yellow">#FFC048</color>
-    <color name="accent_blue">#4D8DFF</color>
-    <color name="divider_light">#E5E5EA</color>
-    <color name="segment_background">#E9E9EE</color>
-    <color name="pill_background">#F1F1F5</color>
+
+    <!-- Background colors -->
+    <color name="app_background">#F5F7FA</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Text colors -->
+    <color name="text_primary">#2C3E50</color>
+    <color name="text_secondary">#7F8C8D</color>
+    <color name="text_light">#BDC3C7</color>
+
+    <!-- Accent colors -->
+    <color name="primary_blue">#3498DB</color>
+    <color name="accent_red">#E74C3C</color>
+    <color name="accent_green">#2ECC71</color>
+    <color name="accent_orange">#F39C12</color>
+    <color name="accent_purple">#9B59B6</color>
+
+    <!-- Chart colors -->
+    <color name="chart_blue">#5B8FF9</color>
+    <color name="chart_green">#61DDAA</color>
+    <color name="chart_yellow">#F6BD16</color>
+    <color name="chart_red">#E8684A</color>
+
+    <!-- UI elements -->
+    <color name="divider_light">#ECF0F1</color>
+    <color name="segment_background">#F8F9FA</color>
+    <color name="pill_background">#EEF2F7</color>
+    <color name="shadow">#1A000000</color>
 </resources>

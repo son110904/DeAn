@@ -33,9 +33,6 @@
             android:name=".ForecastActivity"
             android:exported="false" />
         <activity
-            android:name=".MonthActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="false" />
     </application>
