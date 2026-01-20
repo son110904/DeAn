@@ -1,7 +1,6 @@
 package com.example.myapplication;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -10,32 +9,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class ForecastActivity extends AppCompatActivity {
-    private static final String PREFS_NAME = "finance_prefs";
-    private static final String KEY_INCOME_TOTAL = "income_total";
-    private static final String KEY_EXPENSE_TOTAL = "expense_total";
-
-    TextView tvForecast;
+public class MonthActivity extends AppCompatActivity {
     BottomNavigationView bottomNav;
     FloatingActionButton fabAdd;
+    TextView tabDaily;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forecast);
+        setContentView(R.layout.activity_month);
 
-        tvForecast = findViewById(R.id.tvForecast);
         bottomNav = findViewById(R.id.bottomNav);
         fabAdd = findViewById(R.id.fabAdd);
+        tabDaily = findViewById(R.id.tabDaily);
 
-        updateForecast();
+        bottomNav.setSelectedItemId(R.id.menu_home);
 
-        // Đánh dấu tab hiện tại
-        bottomNav.setSelectedItemId(R.id.menu_forecast);
-
-        // Điều hướng
         bottomNav.setOnItemSelectedListener(item -> {
-
             int id = item.getItemId();
 
             if (id == R.id.menu_home) {
@@ -47,29 +37,19 @@ public class ForecastActivity extends AppCompatActivity {
                 return true;
 
             } else if (id == R.id.menu_forecast) {
+                startActivity(new Intent(this, ForecastActivity.class));
                 return true;
             }
 
             return false;
         });
 
+        tabDaily.setOnClickListener(v ->
+            startActivity(new Intent(this, MainActivity.class))
+        );
+
         fabAdd.setOnClickListener(v ->
             startActivity(new Intent(this, AddTransactionActivity.class))
         );
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateForecast();
-    }
-
-    private void updateForecast() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        long income = prefs.getLong(KEY_INCOME_TOTAL, 0);
-        long expense = prefs.getLong(KEY_EXPENSE_TOTAL, 0);
-        long balance = income - expense;
-
-        tvForecast.setText(balance + "đ");
     }
 }
