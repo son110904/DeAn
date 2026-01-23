@@ -19,7 +19,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add transaction"
+                android:text="Thêm giao dịch"
                 android:textColor="@color/text_primary"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -40,7 +40,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_segmented_selected"
                     android:gravity="center"
-                    android:text="New income"
+                    android:text="Khoản thu"
                     android:textColor="@color/primary_blue"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -51,7 +51,7 @@
                     android:layout_height="44dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="New expense"
+                    android:text="Khoản chi"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -69,7 +69,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Amount"
+                    android:text="Số tiền"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -90,7 +90,7 @@
                         android:layout_height="50dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
-                        android:hint="89,000"
+                        android:hint="Nhập số tiền"
                         android:inputType="numberDecimal"
                         android:textColor="@color/text_primary"
                         android:textColorHint="@color/text_light"
@@ -109,7 +109,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="From account"
+                    android:text="Từ tài khoản"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -128,7 +128,7 @@
                         android:background="@drawable/bg_pill"
                         android:layout_marginBottom="8dp"
                         android:paddingStart="16dp"
-                        android:text="ING"
+                        android:text="Tài khoản ngân hàng"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp" />
 
@@ -139,7 +139,7 @@
                         android:background="@drawable/bg_pill"
                         android:layout_marginBottom="8dp"
                         android:paddingStart="16dp"
-                        android:text="BRD"
+                        android:text="Thẻ tín dụng"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp" />
 
@@ -148,7 +148,7 @@
                         android:layout_height="50dp"
                         android:background="@drawable/bg_pill"
                         android:paddingStart="16dp"
-                        android:text="Cash"
+                        android:text="Tiền mặt"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </RadioGroup>
@@ -157,7 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="From category"
+                    android:text="Từ danh mục"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -177,7 +177,7 @@
                 android:layout_height="54dp"
                 android:layout_marginTop="24dp"
                 android:backgroundTint="@color/primary_blue"
-                android:text="Confirm"
+                android:text="Xác nhận"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"

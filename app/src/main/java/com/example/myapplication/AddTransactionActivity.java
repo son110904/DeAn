@@ -70,7 +70,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             String category = spinnerCategory.getSelectedItem().toString();
 
             Toast.makeText(this,
-                    "Đã lưu: " + amount + " euro\n" +
+                    "Đã lưu: " + amount + " đồng\n" +
                             "Tài khoản: " + account + "\n" +
                             "Danh mục: " + category,
                     Toast.LENGTH_LONG).show();

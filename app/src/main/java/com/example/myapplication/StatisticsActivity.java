@@ -29,47 +29,48 @@ public class StatisticsActivity extends AppCompatActivity {
         pieChart = findViewById(R.id.pieChart);
         bottomNav = findViewById(R.id.bottomNav);
 
-        // Dữ liệu biểu đồ tròn
         ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(40f, "Ăn uống"));
-        entries.add(new PieEntry(30f, "Di chuyển"));
-        entries.add(new PieEntry(30f, "Khác"));
+        if (entries.isEmpty()) {
+            pieChart.clear();
+            pieChart.setNoDataText("Chưa có dữ liệu chi tiêu.");
+            pieChart.invalidate();
+        } else {
+            PieDataSet dataSet = new PieDataSet(entries, "");
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
+            // Màu sắc theo style mới
+            dataSet.setColors(
+                    Color.parseColor("#5B8FF9"),
+                    Color.parseColor("#61DDAA"),
+                    Color.parseColor("#F6BD16")
+            );
 
-        // Màu sắc theo style mới
-        dataSet.setColors(
-                Color.parseColor("#5B8FF9"),
-                Color.parseColor("#61DDAA"),
-                Color.parseColor("#F6BD16")
-        );
+            dataSet.setSliceSpace(3f);
+            dataSet.setSelectionShift(8f);
+            dataSet.setValueTextSize(14f);
+            dataSet.setValueTextColor(Color.WHITE);
+            dataSet.setValueFormatter(new PercentFormatter(pieChart));
 
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(8f);
-        dataSet.setValueTextSize(14f);
-        dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueFormatter(new PercentFormatter(pieChart));
+            PieData data = new PieData(dataSet);
 
-        PieData data = new PieData(dataSet);
+            pieChart.setData(data);
+            pieChart.getDescription().setEnabled(false);
+            pieChart.setDrawHoleEnabled(true);
+            pieChart.setHoleColor(Color.TRANSPARENT);
+            pieChart.setHoleRadius(60f);
+            pieChart.setTransparentCircleRadius(65f);
+            pieChart.setDrawCenterText(false);
+            pieChart.setRotationEnabled(true);
+            pieChart.setHighlightPerTapEnabled(true);
 
-        pieChart.setData(data);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(Color.TRANSPARENT);
-        pieChart.setHoleRadius(60f);
-        pieChart.setTransparentCircleRadius(65f);
-        pieChart.setDrawCenterText(false);
-        pieChart.setRotationEnabled(true);
-        pieChart.setHighlightPerTapEnabled(true);
+            // Tùy chỉnh legend
+            Legend legend = pieChart.getLegend();
+            legend.setEnabled(false); // Tắt legend vì đã có trong layout
 
-        // Tùy chỉnh legend
-        Legend legend = pieChart.getLegend();
-        legend.setEnabled(false); // Tắt legend vì đã có trong layout
-
-        pieChart.setUsePercentValues(true);
-        pieChart.setEntryLabelColor(Color.TRANSPARENT);
-        pieChart.animateY(1000);
-        pieChart.invalidate();
+            pieChart.setUsePercentValues(true);
+            pieChart.setEntryLabelColor(Color.TRANSPARENT);
+            pieChart.animateY(1000);
+            pieChart.invalidate();
+        }
 
         // Đánh dấu tab hiện tại
         bottomNav.setSelectedItemId(R.id.menu_stats);
