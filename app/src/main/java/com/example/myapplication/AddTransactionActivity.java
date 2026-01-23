@@ -2,18 +2,39 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.*;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AddTransactionActivity extends AppCompatActivity {
 
+    private static final String DEFAULT_CATEGORY = "Chọn danh mục";
+
     EditText edtAmount;
     RadioGroup rgType;
     Button btnSave;
     BottomNavigationView bottomNav;
     Spinner spinnerCategory;
+    TextView btnNewIncome;
+    TextView btnNewExpense;
+    TextView tvAccountLabel;
+    LinearLayout categorySection;
+    RadioButton rbBank;
+    RadioButton rbCredit;
+    RadioButton rbCash;
+
+    boolean isExpense = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +46,20 @@ public class AddTransactionActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         bottomNav = findViewById(R.id.bottomNav);
         spinnerCategory = findViewById(R.id.spinnerCategory);
+        btnNewIncome = findViewById(R.id.btnNewIncome);
+        btnNewExpense = findViewById(R.id.btnNewExpense);
+        tvAccountLabel = findViewById(R.id.tvAccountLabel);
+        categorySection = findViewById(R.id.categorySection);
+        rbBank = findViewById(R.id.rbBank);
+        rbCredit = findViewById(R.id.rbCredit);
+        rbCash = findViewById(R.id.rbCash);
 
         // Thiết lập spinner categories
         setupCategorySpinner();
+
+        btnNewIncome.setOnClickListener(v -> selectTransactionType(false));
+        btnNewExpense.setOnClickListener(v -> selectTransactionType(true));
+        selectTransactionType(true);
 
         // Đánh dấu tab hiện tại
         bottomNav.setSelectedItemId(R.id.menu_add);
@@ -57,10 +89,11 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         // Xử lý lưu giao dịch
         btnSave.setOnClickListener(v -> {
-            String amount = edtAmount.getText().toString();
+            String amountText = edtAmount.getText().toString();
+            long amount = parseAmount(amountText);
             int checkedId = rgType.getCheckedRadioButtonId();
 
-            if (amount.isEmpty() || checkedId == -1) {
+            if (amount <= 0 || checkedId == -1) {
                 Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -69,30 +102,47 @@ public class AddTransactionActivity extends AppCompatActivity {
             String account = rb.getText().toString();
             String category = spinnerCategory.getSelectedItem().toString();
 
-            Toast.makeText(this,
-                    "Đã lưu: " + amount + " đồng\n" +
-                            "Tài khoản: " + account + "\n" +
-                            "Danh mục: " + category,
-                    Toast.LENGTH_LONG).show();
+            if (isExpense && DEFAULT_CATEGORY.equals(category)) {
+                Toast.makeText(this, "Vui lòng chọn danh mục", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (isExpense) {
+                String categoryKey = TransactionStore.normalizeCategory(category);
+                TransactionStore.addExpense(this, amount, account, categoryKey);
+                Toast.makeText(this,
+                        "Đã lưu: Chi " + TransactionStore.formatCurrency(amount) + "\n" +
+                                "Tài khoản: " + account + "\n" +
+                                "Danh mục: " + categoryKey,
+                        Toast.LENGTH_LONG).show();
+            } else {
+                TransactionStore.addIncome(this, amount, account);
+                Toast.makeText(this,
+                        "Đã lưu: Thu " + TransactionStore.formatCurrency(amount) + "\n" +
+                                "Tài khoản nhận: " + account,
+                        Toast.LENGTH_LONG).show();
+            }
 
             // Reset form
             edtAmount.setText("");
             rgType.clearCheck();
             spinnerCategory.setSelection(0);
+            selectTransactionType(isExpense);
         });
     }
 
     private void setupCategorySpinner() {
         // Danh sách categories
         String[] categories = {
-                "Chọn danh mục",
+                DEFAULT_CATEGORY,
                 "🍜 Ăn uống",
-                "🚗 Giao thông",
+                "🚗 Giao thông vận tải",
                 "🏠 Nhà ở",
                 "🎮 Giải trí",
                 "🛒 Mua sắm",
                 "💊 Y tế",
                 "📚 Giáo dục",
+                "🖼️ Sở thích",
                 "💰 Khác"
         };
 
@@ -103,5 +153,41 @@ public class AddTransactionActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategory.setAdapter(adapter);
+    }
+
+    private void selectTransactionType(boolean expenseSelected) {
+        isExpense = expenseSelected;
+
+        if (expenseSelected) {
+            btnNewExpense.setBackgroundResource(R.drawable.bg_segmented_selected);
+            btnNewExpense.setTextColor(getColor(R.color.primary_blue));
+            btnNewIncome.setBackgroundResource(android.R.color.transparent);
+            btnNewIncome.setTextColor(getColor(R.color.text_secondary));
+            tvAccountLabel.setText("Từ tài khoản");
+            categorySection.setVisibility(View.VISIBLE);
+            rbCredit.setVisibility(View.VISIBLE);
+        } else {
+            btnNewIncome.setBackgroundResource(R.drawable.bg_segmented_selected);
+            btnNewIncome.setTextColor(getColor(R.color.primary_blue));
+            btnNewExpense.setBackgroundResource(android.R.color.transparent);
+            btnNewExpense.setTextColor(getColor(R.color.text_secondary));
+            tvAccountLabel.setText("Thu về");
+            categorySection.setVisibility(View.GONE);
+            rbCredit.setVisibility(View.GONE);
+            if (rbCredit.isChecked()) {
+                rgType.clearCheck();
+            }
+        }
+    }
+
+    private long parseAmount(String raw) {
+        if (raw == null) {
+            return 0L;
+        }
+        String digits = raw.replaceAll("[^\\d]", "");
+        if (digits.isEmpty()) {
+            return 0L;
+        }
+        return Long.parseLong(digits);
     }
 }

@@ -39,6 +39,8 @@
                     android:layout_height="44dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_segmented_selected"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:text="Khoản thu"
                     android:textColor="@color/primary_blue"
@@ -50,6 +52,8 @@
                     android:layout_width="0dp"
                     android:layout_height="44dp"
                     android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:text="Khoản chi"
                     android:textColor="@color/text_secondary"
@@ -106,6 +110,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvAccountLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
@@ -122,7 +127,7 @@
                     android:orientation="vertical">
 
                     <RadioButton
-                        android:id="@+id/rbIncome"
+                        android:id="@+id/rbBank"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="@drawable/bg_pill"
@@ -133,7 +138,7 @@
                         android:textSize="15sp" />
 
                     <RadioButton
-                        android:id="@+id/rbExpense"
+                        android:id="@+id/rbCredit"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="@drawable/bg_pill"
@@ -144,6 +149,7 @@
                         android:textSize="15sp" />
 
                     <RadioButton
+                        android:id="@+id/rbCash"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="@drawable/bg_pill"
@@ -153,22 +159,29 @@
                         android:textSize="15sp" />
                 </RadioGroup>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Từ danh mục"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <Spinner
-                    android:id="@+id/spinnerCategory"
+                <LinearLayout
+                    android:id="@+id/categorySection"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_pill"
-                    android:paddingHorizontal="16dp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="Từ danh mục"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/spinnerCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_pill"
+                        android:paddingHorizontal="16dp" />
+                </LinearLayout>
             </LinearLayout>
 
             <Button
