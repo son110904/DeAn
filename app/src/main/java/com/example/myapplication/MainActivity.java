@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.graphics.Color;
 
@@ -15,14 +16,14 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
     TextView tvSeeAll;
+    TextView tvNoTransactions;
+    TextView tvLatestTransaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         tvBalance = findViewById(R.id.tvBalance);
         barChart = findViewById(R.id.barChart);
         tvSeeAll = findViewById(R.id.tvSeeAll);
+        tvNoTransactions = findViewById(R.id.tvNoTransactions);
+        tvLatestTransaction = findViewById(R.id.tvLatestTransaction);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -61,25 +64,48 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        int income = 0;
-        int expense = 0;
-        int balance = income - expense;
-
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        tvIncome.setText(formatter.format(income) + "đ");
-        tvExpense.setText(formatter.format(expense) + "đ");
-        tvBalance.setText(formatter.format(balance) + "đ");
-
         tvSeeAll.setOnClickListener(v -> {
             startActivity(new Intent(this, TransactionsActivity.class));
         });
-
-        // Load biểu đồ
-        setupBarChart();
     }
 
-    private void setupBarChart() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateDashboard();
+    }
+
+    private void updateDashboard() {
+        long income = TransactionStore.getIncomeTotal(this);
+        long expense = TransactionStore.getExpenseTotal(this);
+        long balance = income - expense;
+
+        tvIncome.setText(TransactionStore.formatCurrency(income));
+        tvExpense.setText(TransactionStore.formatCurrency(expense));
+        tvBalance.setText(TransactionStore.formatCurrency(balance));
+
+        String latest = TransactionStore.getLastTransaction(this);
+        if (latest == null || latest.isEmpty()) {
+            tvNoTransactions.setVisibility(View.VISIBLE);
+            tvLatestTransaction.setVisibility(View.GONE);
+        } else {
+            tvNoTransactions.setVisibility(View.GONE);
+            tvLatestTransaction.setVisibility(View.VISIBLE);
+            tvLatestTransaction.setText(latest);
+        }
+
+        setupBarChart(income, expense);
+    }
+
+    private void setupBarChart(long income, long expense) {
         ArrayList<BarEntry> entries = new ArrayList<>();
+        if (income > 0) {
+            entries.add(new BarEntry(0f, income));
+        }
+        if (expense > 0) {
+            entries.add(new BarEntry(1f, expense));
+        }
+
         if (entries.isEmpty()) {
             barChart.clear();
             barChart.setNoDataText("Chưa có dữ liệu biểu đồ.");
@@ -92,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
         // Màu sắc theo style mới
         dataSet.setColors(
                 Color.parseColor("#5B8FF9"),
-                Color.parseColor("#61DDAA"),
-                Color.parseColor("#F6BD16"),
                 Color.parseColor("#E8684A")
         );
 
@@ -121,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setDrawAxisLine(true);
         xAxis.setTextColor(Color.parseColor("#8E8E93"));
         xAxis.setAxisLineColor(Color.parseColor("#ECF0F1"));
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(entries.size());
+        xAxis.setDrawLabels(false);
 
         // Trục Y trái
         YAxis leftAxis = barChart.getAxisLeft();
@@ -134,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setEnabled(false);
 
-        barChart.animateY(1000);
+        barChart.animateY(800);
         barChart.invalidate();
     }
 }

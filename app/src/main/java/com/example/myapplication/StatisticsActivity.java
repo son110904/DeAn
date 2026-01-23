@@ -2,23 +2,33 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.components.Legend;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.ArrayList;
 
 public class StatisticsActivity extends AppCompatActivity {
 
-    PieChart pieChart;
+    private static final BudgetCategory[] DEFAULT_CATEGORIES = new BudgetCategory[]{
+            new BudgetCategory("🍜 Ăn uống", 500_000),
+            new BudgetCategory("🎮 Giải trí", 300_000),
+            new BudgetCategory("🚗 Giao thông vận tải", 140_000),
+            new BudgetCategory("🖼️ Sở thích", 30_000)
+    };
+
+    TextView tvBudgetExpenseTab;
+    TextView tvBudgetRemaining;
+    TextView tvBudgetPercent;
+    TextView tvBudgetSpent;
+    TextView tvBudgetRemainingValue;
+    TextView tvBudgetTotal;
+    ProgressBar progressBudgetTotal;
+    LinearLayout budgetCategoryContainer;
     BottomNavigationView bottomNav;
 
     @Override
@@ -26,51 +36,15 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
 
-        pieChart = findViewById(R.id.pieChart);
+        tvBudgetExpenseTab = findViewById(R.id.tvBudgetExpenseTab);
+        tvBudgetRemaining = findViewById(R.id.tvBudgetRemaining);
+        tvBudgetPercent = findViewById(R.id.tvBudgetPercent);
+        tvBudgetSpent = findViewById(R.id.tvBudgetSpent);
+        tvBudgetRemainingValue = findViewById(R.id.tvBudgetRemainingValue);
+        tvBudgetTotal = findViewById(R.id.tvBudgetTotal);
+        progressBudgetTotal = findViewById(R.id.progressBudgetTotal);
+        budgetCategoryContainer = findViewById(R.id.budgetCategoryContainer);
         bottomNav = findViewById(R.id.bottomNav);
-
-        ArrayList<PieEntry> entries = new ArrayList<>();
-        if (entries.isEmpty()) {
-            pieChart.clear();
-            pieChart.setNoDataText("Chưa có dữ liệu chi tiêu.");
-            pieChart.invalidate();
-        } else {
-            PieDataSet dataSet = new PieDataSet(entries, "");
-
-            // Màu sắc theo style mới
-            dataSet.setColors(
-                    Color.parseColor("#5B8FF9"),
-                    Color.parseColor("#61DDAA"),
-                    Color.parseColor("#F6BD16")
-            );
-
-            dataSet.setSliceSpace(3f);
-            dataSet.setSelectionShift(8f);
-            dataSet.setValueTextSize(14f);
-            dataSet.setValueTextColor(Color.WHITE);
-            dataSet.setValueFormatter(new PercentFormatter(pieChart));
-
-            PieData data = new PieData(dataSet);
-
-            pieChart.setData(data);
-            pieChart.getDescription().setEnabled(false);
-            pieChart.setDrawHoleEnabled(true);
-            pieChart.setHoleColor(Color.TRANSPARENT);
-            pieChart.setHoleRadius(60f);
-            pieChart.setTransparentCircleRadius(65f);
-            pieChart.setDrawCenterText(false);
-            pieChart.setRotationEnabled(true);
-            pieChart.setHighlightPerTapEnabled(true);
-
-            // Tùy chỉnh legend
-            Legend legend = pieChart.getLegend();
-            legend.setEnabled(false); // Tắt legend vì đã có trong layout
-
-            pieChart.setUsePercentValues(true);
-            pieChart.setEntryLabelColor(Color.TRANSPARENT);
-            pieChart.animateY(1000);
-            pieChart.invalidate();
-        }
 
         // Đánh dấu tab hiện tại
         bottomNav.setSelectedItemId(R.id.menu_stats);
@@ -97,5 +71,79 @@ public class StatisticsActivity extends AppCompatActivity {
 
             return false;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBudget();
+    }
+
+    private void updateBudget() {
+        long incomeTotal = TransactionStore.getIncomeTotal(this);
+        long expenseTotal = TransactionStore.getExpenseTotal(this);
+        long remaining = incomeTotal - expenseTotal;
+
+        tvBudgetExpenseTab.setText("Chi " + TransactionStore.formatCurrency(expenseTotal));
+        tvBudgetRemaining.setText(TransactionStore.formatCurrency(remaining));
+        tvBudgetTotal.setText(TransactionStore.formatCurrency(incomeTotal));
+        tvBudgetSpent.setText(TransactionStore.formatCurrency(expenseTotal));
+        tvBudgetRemainingValue.setText(TransactionStore.formatCurrency(Math.max(remaining, 0)));
+
+        int percent = incomeTotal > 0 ? Math.min(100, Math.round((expenseTotal * 100f) / incomeTotal)) : 0;
+        tvBudgetPercent.setText(percent + "%");
+        progressBudgetTotal.setProgress(percent);
+
+        renderCategories(incomeTotal);
+    }
+
+    private void renderCategories(long incomeTotal) {
+        budgetCategoryContainer.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        long defaultSum = 0L;
+        for (BudgetCategory category : DEFAULT_CATEGORIES) {
+            defaultSum += category.defaultBudget;
+        }
+
+        for (BudgetCategory category : DEFAULT_CATEGORIES) {
+            View itemView = inflater.inflate(R.layout.item_budget_category, budgetCategoryContainer, false);
+            TextView nameView = itemView.findViewById(R.id.tvCategoryName);
+            TextView budgetView = itemView.findViewById(R.id.tvCategoryBudget);
+            TextView percentView = itemView.findViewById(R.id.tvCategoryPercent);
+            TextView spentView = itemView.findViewById(R.id.tvCategorySpent);
+            TextView remainingView = itemView.findViewById(R.id.tvCategoryRemaining);
+            ProgressBar progressBar = itemView.findViewById(R.id.progressCategory);
+
+            long budgetAmount = incomeTotal > 0
+                    ? Math.round((category.defaultBudget / (float) defaultSum) * incomeTotal)
+                    : category.defaultBudget;
+
+            long spent = TransactionStore.getCategoryTotal(this, category.getKey());
+            long remaining = Math.max(0, budgetAmount - spent);
+            int percent = budgetAmount > 0 ? Math.min(100, Math.round((spent * 100f) / budgetAmount)) : 0;
+
+            nameView.setText(category.label);
+            budgetView.setText(TransactionStore.formatCurrency(budgetAmount));
+            percentView.setText(percent + "%");
+            spentView.setText(TransactionStore.formatCurrency(spent));
+            remainingView.setText(TransactionStore.formatCurrency(remaining));
+            progressBar.setProgress(percent);
+
+            budgetCategoryContainer.addView(itemView);
+        }
+    }
+
+    private static class BudgetCategory {
+        private final String label;
+        private final long defaultBudget;
+
+        BudgetCategory(String label, long defaultBudget) {
+            this.label = label;
+            this.defaultBudget = defaultBudget;
+        }
+
+        String getKey() {
+            return TransactionStore.normalizeCategory(label);
+        }
     }
 }
