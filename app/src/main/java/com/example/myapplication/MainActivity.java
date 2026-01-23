@@ -22,6 +22,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
+    TextView tvSeeAll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         tvExpense = findViewById(R.id.tvExpense);
         tvBalance = findViewById(R.id.tvBalance);
         barChart = findViewById(R.id.barChart);
+        tvSeeAll = findViewById(R.id.tvSeeAll);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -59,16 +61,18 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        // Dữ liệu giả
-        int income = 10000000;
-        int expense = 5000000;
+        int income = 0;
+        int expense = 0;
         int balance = income - expense;
 
-        // Format số tiền
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         tvIncome.setText(formatter.format(income) + "đ");
         tvExpense.setText(formatter.format(expense) + "đ");
         tvBalance.setText(formatter.format(balance) + "đ");
+
+        tvSeeAll.setOnClickListener(v -> {
+            startActivity(new Intent(this, TransactionsActivity.class));
+        });
 
         // Load biểu đồ
         setupBarChart();
@@ -76,10 +80,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupBarChart() {
         ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(1, 2000000)); // 10 May
-        entries.add(new BarEntry(2, 3500000)); // 20 May
-        entries.add(new BarEntry(3, 1500000)); // 30 May
-        entries.add(new BarEntry(4, 5000000)); // Today
+        if (entries.isEmpty()) {
+            barChart.clear();
+            barChart.setNoDataText("Chưa có dữ liệu biểu đồ.");
+            barChart.invalidate();
+            return;
+        }
 
         BarDataSet dataSet = new BarDataSet(entries, "");
 

@@ -8,9 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 public class ForecastActivity extends AppCompatActivity {
 
     TextView tvForecast;
@@ -24,10 +21,7 @@ public class ForecastActivity extends AppCompatActivity {
         tvForecast = findViewById(R.id.tvForecast);
         bottomNav = findViewById(R.id.bottomNav);
 
-        // Format số tiền
-        int forecastAmount = 6200000;
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        tvForecast.setText(formatter.format(forecastAmount) + "đ");
+        tvForecast.setText("Chưa có dữ liệu");
 
         // Đánh dấu tab hiện tại
         bottomNav.setSelectedItemId(R.id.menu_forecast);
