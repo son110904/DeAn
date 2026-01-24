@@ -36,6 +36,8 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
 
+        TransactionStore.ensureDemoData(this);
+
         tvBudgetExpenseTab = findViewById(R.id.tvBudgetExpenseTab);
         tvBudgetRemaining = findViewById(R.id.tvBudgetRemaining);
         tvBudgetPercent = findViewById(R.id.tvBudgetPercent);
