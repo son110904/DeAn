@@ -12,6 +12,7 @@ public class TransactionStore {
     private static final String KEY_EXPENSE_TOTAL = "expense_total";
     private static final String KEY_LAST_TRANSACTION = "last_transaction";
     private static final String KEY_CATEGORY_PREFIX = "category_total_";
+    private static final String KEY_DEMO_SEEDED = "demo_seeded";
 
     private TransactionStore() {
     }
@@ -30,6 +31,28 @@ public class TransactionStore {
 
     public static long getCategoryTotal(Context context, String categoryKey) {
         return getPrefs(context).getLong(KEY_CATEGORY_PREFIX + categoryKey, 0L);
+    }
+
+    public static void ensureDemoData(Context context) {
+        SharedPreferences prefs = getPrefs(context);
+        if (prefs.getBoolean(KEY_DEMO_SEEDED, false)) {
+            return;
+        }
+
+        long incomeTotal = 12_500_000L;
+        long expenseTotal = 6_450_000L;
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(KEY_INCOME_TOTAL, incomeTotal);
+        editor.putLong(KEY_EXPENSE_TOTAL, expenseTotal);
+        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🍜 Ăn uống"), 2_800_000L);
+        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🎮 Giải trí"), 1_600_000L);
+        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🚗 Giao thông vận tải"), 1_200_000L);
+        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🖼️ Sở thích"), 850_000L);
+        editor.putString(KEY_LAST_TRANSACTION,
+                "Chi " + formatCurrency(850_000L) + " • Sở thích • Ví");
+        editor.putBoolean(KEY_DEMO_SEEDED, true);
+        editor.apply();
     }
 
     public static void addIncome(Context context, long amount, String account) {
