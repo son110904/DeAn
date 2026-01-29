@@ -12,7 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -92,32 +94,15 @@ public class StatisticsActivity extends AppCompatActivity {
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     TransactionStore.syncFromTransactions(StatisticsActivity.this, response.body());
-                }
-                updateBudget();
-            }
-
-            @Override
-            public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
-                updateBudget();
-            }
-        });
-    }
-
-    private void fetchTransactions() {
-        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
-        apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
-            @Override
-            public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
                     updateBudget(response.body());
                 } else {
-                    updateBudget(new java.util.ArrayList<>());
+                    updateBudgetFromStore();
                 }
             }
 
             @Override
             public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
-                updateBudget(new java.util.ArrayList<>());
+                updateBudgetFromStore();
             }
         });
     }
@@ -138,6 +123,22 @@ public class StatisticsActivity extends AppCompatActivity {
         }
         long remaining = incomeTotal - expenseTotal;
 
+        applyBudgetSummary(incomeTotal, expenseTotal, categoryTotals, remaining);
+    }
+
+    private void updateBudgetFromStore() {
+        long incomeTotal = TransactionStore.getIncomeTotal(this);
+        long expenseTotal = TransactionStore.getExpenseTotal(this);
+        Map<String, Long> categoryTotals = new HashMap<>();
+        for (BudgetCategory category : DEFAULT_CATEGORIES) {
+            String key = category.getKey();
+            categoryTotals.put(key, TransactionStore.getCategoryTotal(this, key));
+        }
+        long remaining = incomeTotal - expenseTotal;
+        applyBudgetSummary(incomeTotal, expenseTotal, categoryTotals, remaining);
+    }
+
+    private void applyBudgetSummary(long incomeTotal, long expenseTotal, Map<String, Long> categoryTotals, long remaining) {
         tvBudgetExpenseTab.setText("Chi " + TransactionStore.formatCurrency(expenseTotal));
         tvBudgetRemaining.setText(TransactionStore.formatCurrency(remaining));
         tvBudgetTotal.setText(TransactionStore.formatCurrency(incomeTotal));
