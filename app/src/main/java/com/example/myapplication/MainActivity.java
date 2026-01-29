@@ -9,8 +9,6 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -136,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
         long income = TransactionStore.getIncomeTotal(this);
         long expense = TransactionStore.getExpenseTotal(this);
         updateDashboardTotals(income, expense);
+        allTransactions.clear();
+        renderTransactions();
     }
 
     private void updateDashboardTotals(long income, long expense) {
@@ -143,15 +143,6 @@ public class MainActivity extends AppCompatActivity {
         tvIncome.setText(TransactionStore.formatCurrency(income));
         tvExpense.setText(TransactionStore.formatCurrency(expense));
         tvBalance.setText(TransactionStore.formatCurrency(balance));
-        setupBarChart(income, expense);
-    }
-
-    private void renderTransactions() {
-        if (cachedTransactions == null) {
-            cachedTransactions = Collections.emptyList();
-        }
-
-        renderTransactions();
         setupBarChart(income, expense);
     }
 
@@ -165,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tvNoTransactions.setVisibility(View.GONE);
-        int maxItems = isExpanded ? allTransactions.size() : Math.min(3, allTransactions.size());
+        int maxItems = isExpanded ? allTransactions.size() : Math.min(PREVIEW_LIMIT, allTransactions.size());
         List<TransactionResponse> visible = allTransactions.subList(0, maxItems);
 
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -192,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             transactionListContainer.addView(itemView);
         }
 
-        if (allTransactions.size() > 3) {
+        if (allTransactions.size() > PREVIEW_LIMIT) {
             tvSeeAll.setVisibility(View.VISIBLE);
             tvSeeAll.setText(isExpanded ? "Thu gọn" : "Xem tất cả");
         } else {
