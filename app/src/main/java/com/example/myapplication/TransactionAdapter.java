@@ -71,7 +71,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             super(itemView);
             title = itemView.findViewById(R.id.tvTransactionTitle);
             amount = itemView.findViewById(R.id.tvTransactionAmount);
-            subtitle = itemView.findViewById(R.id.tvTransactionSubtitle);
+            subtitle = itemView.findViewById(R.id.tvTransactionMeta);
         }
     }
 }
