@@ -12,4 +12,20 @@ public class TransactionRequest {
         this.type = type;
         this.note = note;
     }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getNote() {
+        return note;
+    }
 }

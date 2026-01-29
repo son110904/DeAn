@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class TransactionStore {
@@ -12,8 +13,6 @@ public class TransactionStore {
     private static final String KEY_EXPENSE_TOTAL = "expense_total";
     private static final String KEY_LAST_TRANSACTION = "last_transaction";
     private static final String KEY_CATEGORY_PREFIX = "category_total_";
-    private static final String KEY_DEMO_SEEDED = "demo_seeded";
-
     private TransactionStore() {
     }
 
@@ -33,25 +32,49 @@ public class TransactionStore {
         return getPrefs(context).getLong(KEY_CATEGORY_PREFIX + categoryKey, 0L);
     }
 
-    public static void ensureDemoData(Context context) {
+    public static void syncFromTransactions(Context context, List<TransactionResponse> transactions) {
         SharedPreferences prefs = getPrefs(context);
-        if (prefs.getBoolean(KEY_DEMO_SEEDED, false)) {
-            return;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
+
+        long incomeTotal = 0L;
+        long expenseTotal = 0L;
+        String lastTransaction = "";
+
+        java.util.Map<String, Long> categoryTotals = new java.util.HashMap<>();
+
+        if (transactions != null) {
+            for (TransactionResponse transaction : transactions) {
+                long amount = transaction.getAmount();
+                if ("income".equalsIgnoreCase(transaction.getType())) {
+                    incomeTotal += amount;
+                } else {
+                    expenseTotal += amount;
+                    String categoryKey = normalizeCategory(transaction.getCategory());
+                    long current = categoryTotals.getOrDefault(categoryKey, 0L);
+                    categoryTotals.put(categoryKey, current + amount);
+                }
+            }
+
+            if (!transactions.isEmpty()) {
+                TransactionResponse latest = transactions.get(transactions.size() - 1);
+                String label = "income".equalsIgnoreCase(latest.getType()) ? "Thu" : "Chi";
+                String category = latest.getCategory();
+                String note = latest.getNote();
+                String detail = category != null && !category.isEmpty() ? " • " + category : "";
+                if (note != null && !note.isEmpty()) {
+                    detail += " • " + note;
+                }
+                lastTransaction = label + " " + formatCurrency(latest.getAmount()) + detail;
+            }
         }
 
-        long incomeTotal = 12_500_000L;
-        long expenseTotal = 6_450_000L;
-
-        SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(KEY_INCOME_TOTAL, incomeTotal);
         editor.putLong(KEY_EXPENSE_TOTAL, expenseTotal);
-        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🍜 Ăn uống"), 2_800_000L);
-        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🎮 Giải trí"), 1_600_000L);
-        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🚗 Giao thông vận tải"), 1_200_000L);
-        editor.putLong(KEY_CATEGORY_PREFIX + normalizeCategory("🖼️ Sở thích"), 850_000L);
-        editor.putString(KEY_LAST_TRANSACTION,
-                "Chi " + formatCurrency(850_000L) + " • Sở thích • Ví");
-        editor.putBoolean(KEY_DEMO_SEEDED, true);
+        for (java.util.Map.Entry<String, Long> entry : categoryTotals.entrySet()) {
+            editor.putLong(KEY_CATEGORY_PREFIX + entry.getKey(), entry.getValue());
+        }
+        editor.putString(KEY_LAST_TRANSACTION, lastTransaction);
         editor.apply();
     }
 

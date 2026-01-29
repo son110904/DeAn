@@ -12,9 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -85,6 +83,24 @@ public class StatisticsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         fetchTransactions();
+    }
+
+    private void fetchTransactions() {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
+            @Override
+            public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TransactionStore.syncFromTransactions(StatisticsActivity.this, response.body());
+                }
+                updateBudget();
+            }
+
+            @Override
+            public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
+                updateBudget();
+            }
+        });
     }
 
     private void fetchTransactions() {
