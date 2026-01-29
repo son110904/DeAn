@@ -17,6 +17,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class AddTransactionActivity extends AppCompatActivity {
 
     private static final String DEFAULT_CATEGORY = "Chọn danh mục";
@@ -107,27 +111,45 @@ public class AddTransactionActivity extends AppCompatActivity {
                 return;
             }
 
-            if (isExpense) {
-                String categoryKey = TransactionStore.normalizeCategory(category);
-                TransactionStore.addExpense(this, amount, account, categoryKey);
-                Toast.makeText(this,
-                        "Đã lưu: Chi " + TransactionStore.formatCurrency(amount) + "\n" +
-                                "Tài khoản: " + account + "\n" +
-                                "Danh mục: " + categoryKey,
-                        Toast.LENGTH_LONG).show();
-            } else {
-                TransactionStore.addIncome(this, amount, account);
-                Toast.makeText(this,
-                        "Đã lưu: Thu " + TransactionStore.formatCurrency(amount) + "\n" +
-                                "Tài khoản nhận: " + account,
-                        Toast.LENGTH_LONG).show();
-            }
+            String normalizedCategory = isExpense
+                    ? TransactionStore.normalizeCategory(category)
+                    : "Thu nhập";
+            String type = isExpense ? "expense" : "income";
+            TransactionRequest request = new TransactionRequest(
+                    (int) amount,
+                    normalizedCategory,
+                    type,
+                    account
+            );
 
-            // Reset form
-            edtAmount.setText("");
-            rgType.clearCheck();
-            spinnerCategory.setSelection(0);
-            selectTransactionType(isExpense);
+            ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+            apiService.createTransaction(request).enqueue(new Callback<TransactionResponse>() {
+                @Override
+                public void onResponse(Call<TransactionResponse> call, Response<TransactionResponse> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(AddTransactionActivity.this,
+                                "Đã lưu: " + (isExpense ? "Chi " : "Thu ")
+                                        + TransactionStore.formatCurrency(amount),
+                                Toast.LENGTH_LONG).show();
+
+                        edtAmount.setText("");
+                        rgType.clearCheck();
+                        spinnerCategory.setSelection(0);
+                        selectTransactionType(isExpense);
+                    } else {
+                        Toast.makeText(AddTransactionActivity.this,
+                                "Không thể lưu giao dịch",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<TransactionResponse> call, Throwable t) {
+                    Toast.makeText(AddTransactionActivity.this,
+                            "Lỗi kết nối: " + t.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 
