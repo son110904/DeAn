@@ -3,9 +3,12 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -18,18 +21,20 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
     TextView tvSeeAll;
     TextView tvNoTransactions;
-    LinearLayout transactionList;
-    boolean showAllTransactions = false;
-    List<TransactionResponse> cachedTransactions = Collections.emptyList();
-    private static final int PREVIEW_COUNT = 3;
+    LinearLayout transactionListContainer;
+    private final List<TransactionResponse> allTransactions = new ArrayList<>();
+    private boolean isExpanded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         barChart = findViewById(R.id.barChart);
         tvSeeAll = findViewById(R.id.tvSeeAll);
         tvNoTransactions = findViewById(R.id.tvNoTransactions);
-        transactionList = findViewById(R.id.transactionList);
+        transactionListContainer = findViewById(R.id.transactionListContainer);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -71,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tvSeeAll.setOnClickListener(v -> {
-            showAllTransactions = !showAllTransactions;
+            isExpanded = !isExpanded;
             renderTransactions();
         });
     }
@@ -79,28 +84,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        fetchTransactions();
+        updateDashboard();
+        loadTransactions();
     }
 
-    private void fetchTransactions() {
+    private void updateDashboard() {
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
-        apiService.getTransactions().enqueue(new retrofit2.Callback<List<TransactionResponse>>() {
+        apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
             @Override
-            public void onResponse(retrofit2.Call<List<TransactionResponse>> call,
-                                   retrofit2.Response<List<TransactionResponse>> response) {
+            public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    cachedTransactions = response.body();
-                    updateDashboardFromTransactions(cachedTransactions);
+                    allTransactions.clear();
+                    allTransactions.addAll(response.body());
+                    TransactionStore.syncFromTransactions(MainActivity.this, allTransactions);
+                    updateDashboardFromTransactions(allTransactions);
                 } else {
-                    updateDashboardFallback();
+                    updateDashboardFromStore();
                 }
-                renderTransactions();
             }
 
             @Override
-            public void onFailure(retrofit2.Call<List<TransactionResponse>> call, Throwable t) {
-                updateDashboardFallback();
-                renderTransactions();
+            public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
+                updateDashboardFromStore();
             }
         });
     }
@@ -110,19 +115,23 @@ public class MainActivity extends AppCompatActivity {
         long expense = 0L;
 
         for (TransactionResponse transaction : transactions) {
-            long amount = transaction.getAmount();
-            String type = transaction.getType() == null ? "" : transaction.getType().toLowerCase();
-            if (type.contains("income") || type.contains("thu")) {
-                income += amount;
+            if ("income".equalsIgnoreCase(transaction.getType())) {
+                income += transaction.getAmount();
             } else {
-                expense += amount;
+                expense += transaction.getAmount();
             }
         }
 
-        updateDashboardTotals(income, expense);
+        long balance = income - expense;
+        tvIncome.setText(TransactionStore.formatCurrency(income));
+        tvExpense.setText(TransactionStore.formatCurrency(expense));
+        tvBalance.setText(TransactionStore.formatCurrency(balance));
+
+        renderTransactions();
+        setupBarChart(income, expense);
     }
 
-    private void updateDashboardFallback() {
+    private void updateDashboardFromStore() {
         long income = TransactionStore.getIncomeTotal(this);
         long expense = TransactionStore.getExpenseTotal(this);
         updateDashboardTotals(income, expense);
@@ -141,60 +150,64 @@ public class MainActivity extends AppCompatActivity {
             cachedTransactions = Collections.emptyList();
         }
 
-        transactionList.removeAllViews();
-        int totalCount = cachedTransactions.size();
-        if (totalCount == 0) {
+        renderTransactions();
+        setupBarChart(income, expense);
+    }
+
+    private void renderTransactions() {
+        transactionListContainer.removeAllViews();
+
+        if (allTransactions.isEmpty()) {
             tvNoTransactions.setVisibility(View.VISIBLE);
             tvSeeAll.setVisibility(View.GONE);
             return;
         }
 
         tvNoTransactions.setVisibility(View.GONE);
-        int displayCount = showAllTransactions ? totalCount : Math.min(PREVIEW_COUNT, totalCount);
-        for (int i = 0; i < displayCount; i++) {
-            TransactionResponse transaction = cachedTransactions.get(i);
-            View itemView = getLayoutInflater().inflate(R.layout.item_transaction, transactionList, false);
+        int maxItems = isExpanded ? allTransactions.size() : Math.min(3, allTransactions.size());
+        List<TransactionResponse> visible = allTransactions.subList(0, maxItems);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (TransactionResponse transaction : visible) {
+            View itemView = inflater.inflate(R.layout.item_transaction, transactionListContainer, false);
             TextView titleView = itemView.findViewById(R.id.tvTransactionTitle);
-            TextView subtitleView = itemView.findViewById(R.id.tvTransactionSubtitle);
+            TextView metaView = itemView.findViewById(R.id.tvTransactionMeta);
             TextView amountView = itemView.findViewById(R.id.tvTransactionAmount);
 
-            String category = transaction.getCategory() == null ? "Khác" : transaction.getCategory();
-            String note = transaction.getNote();
-            String createdAt = transaction.getCreatedAt();
-            titleView.setText(category);
+            String type = transaction.getType();
+            boolean isIncome = "income".equalsIgnoreCase(type);
+            String category = transaction.getCategory() != null ? transaction.getCategory() : "";
+            String note = transaction.getNote() != null ? transaction.getNote() : "";
+            String dateLabel = formatDate(transaction.getCreatedAt());
 
-            StringBuilder subtitle = new StringBuilder();
-            if (note != null && !note.isEmpty()) {
-                subtitle.append(note);
-            }
-            if (createdAt != null && !createdAt.isEmpty()) {
-                if (subtitle.length() > 0) {
-                    subtitle.append(" • ");
-                }
-                String cleaned = createdAt.replace("T", " ");
-                int dotIndex = cleaned.indexOf(".");
-                if (dotIndex > 0) {
-                    cleaned = cleaned.substring(0, dotIndex);
-                }
-                subtitle.append(cleaned);
-            }
-            subtitleView.setText(subtitle.toString());
+            titleView.setText(category.isEmpty() ? (isIncome ? "Thu nhập" : "Chi tiêu") : category);
+            String meta = note.isEmpty() ? dateLabel : note + " • " + dateLabel;
+            metaView.setText(meta);
 
-            String type = transaction.getType() == null ? "" : transaction.getType().toLowerCase();
-            boolean isIncome = type.contains("income") || type.contains("thu");
-            String prefix = isIncome ? "+" : "-";
-            amountView.setText(prefix + TransactionStore.formatCurrency(transaction.getAmount()));
+            String amountLabel = (isIncome ? "+ " : "- ") + TransactionStore.formatCurrency(transaction.getAmount());
+            amountView.setText(amountLabel);
             amountView.setTextColor(getColor(isIncome ? R.color.accent_green : R.color.accent_red));
 
-            transactionList.addView(itemView);
+            transactionListContainer.addView(itemView);
         }
 
-        if (totalCount > PREVIEW_COUNT) {
+        if (allTransactions.size() > 3) {
             tvSeeAll.setVisibility(View.VISIBLE);
-            tvSeeAll.setText(showAllTransactions ? "Thu gọn" : "Xem tất cả");
+            tvSeeAll.setText(isExpanded ? "Thu gọn" : "Xem tất cả");
         } else {
             tvSeeAll.setVisibility(View.GONE);
         }
+    }
+
+    private String formatDate(String rawDate) {
+        if (rawDate == null || rawDate.isEmpty()) {
+            return "";
+        }
+        String[] parts = rawDate.split("T");
+        if (parts.length > 0 && !parts[0].isEmpty()) {
+            return parts[0];
+        }
+        return rawDate;
     }
 
     private void setupBarChart(long income, long expense) {

@@ -12,5 +12,5 @@ public interface ApiService {
     Call<List<TransactionResponse>> getTransactions();
 
     @POST("transactions")
-    Call<TransactionResponse> createTransaction(@Body TransactionCreateRequest payload);
+    Call<TransactionResponse> createTransaction(@Body TransactionRequest request);
 }
