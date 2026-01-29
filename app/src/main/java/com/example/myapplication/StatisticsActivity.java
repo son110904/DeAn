@@ -12,6 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class StatisticsActivity extends AppCompatActivity {
 
     private static final BudgetCategory[] DEFAULT_CATEGORIES = new BudgetCategory[]{
@@ -35,8 +41,6 @@ public class StatisticsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-
-        TransactionStore.ensureDemoData(this);
 
         tvBudgetExpenseTab = findViewById(R.id.tvBudgetExpenseTab);
         tvBudgetRemaining = findViewById(R.id.tvBudgetRemaining);
@@ -78,7 +82,25 @@ public class StatisticsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateBudget();
+        fetchTransactions();
+    }
+
+    private void fetchTransactions() {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
+            @Override
+            public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TransactionStore.syncFromTransactions(StatisticsActivity.this, response.body());
+                }
+                updateBudget();
+            }
+
+            @Override
+            public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
+                updateBudget();
+            }
+        });
     }
 
     private void updateBudget() {
