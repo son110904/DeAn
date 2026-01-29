@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.graphics.Color;
 
@@ -17,13 +19,16 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
     TextView tvSeeAll;
     TextView tvNoTransactions;
-    TextView tvLatestTransaction;
+    LinearLayout transactionListContainer;
+    private boolean showAllTransactions = false;
+    private List<TransactionResponse> transactions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         barChart = findViewById(R.id.barChart);
         tvSeeAll = findViewById(R.id.tvSeeAll);
         tvNoTransactions = findViewById(R.id.tvNoTransactions);
-        tvLatestTransaction = findViewById(R.id.tvLatestTransaction);
+        transactionListContainer = findViewById(R.id.transactionListContainer);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -67,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tvSeeAll.setOnClickListener(v -> {
-            startActivity(new Intent(this, TransactionsActivity.class));
+            showAllTransactions = !showAllTransactions;
+            renderTransactionList();
         });
     }
 
@@ -75,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateDashboard();
+        loadTransactions();
     }
 
     private void updateDashboard() {
@@ -86,17 +93,85 @@ public class MainActivity extends AppCompatActivity {
         tvExpense.setText(TransactionStore.formatCurrency(expense));
         tvBalance.setText(TransactionStore.formatCurrency(balance));
 
-        String latest = TransactionStore.getLastTransaction(this);
-        if (latest == null || latest.isEmpty()) {
+        setupBarChart(income, expense);
+    }
+
+    private void loadTransactions() {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.getTransactions().enqueue(new retrofit2.Callback<List<TransactionResponse>>() {
+            @Override
+            public void onResponse(retrofit2.Call<List<TransactionResponse>> call,
+                                   retrofit2.Response<List<TransactionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    transactions = response.body();
+                    renderTransactionList();
+                } else {
+                    showTransactionError("Không lấy được dữ liệu giao dịch.");
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<List<TransactionResponse>> call, Throwable t) {
+                showTransactionError("Không kết nối được máy chủ.");
+            }
+        });
+    }
+
+    private void showTransactionError(String message) {
+        transactions = new ArrayList<>();
+        transactionListContainer.setVisibility(View.GONE);
+        tvNoTransactions.setVisibility(View.VISIBLE);
+        tvNoTransactions.setText(message);
+        tvSeeAll.setVisibility(View.GONE);
+    }
+
+    private void renderTransactionList() {
+        transactionListContainer.removeAllViews();
+        if (transactions == null || transactions.isEmpty()) {
+            transactionListContainer.setVisibility(View.GONE);
             tvNoTransactions.setVisibility(View.VISIBLE);
-            tvLatestTransaction.setVisibility(View.GONE);
-        } else {
-            tvNoTransactions.setVisibility(View.GONE);
-            tvLatestTransaction.setVisibility(View.VISIBLE);
-            tvLatestTransaction.setText(latest);
+            tvNoTransactions.setText("Chưa có giao dịch nào. Hãy thêm giao dịch mới để hiển thị ở đây.");
+            tvSeeAll.setVisibility(View.GONE);
+            return;
         }
 
-        setupBarChart(income, expense);
+        int total = transactions.size();
+        int displayCount = showAllTransactions ? total : Math.min(3, total);
+        for (int i = 0; i < displayCount; i++) {
+            TransactionResponse transaction = transactions.get(i);
+            View itemView = LayoutInflater.from(this)
+                    .inflate(R.layout.item_transaction, transactionListContainer, false);
+
+            TextView titleView = itemView.findViewById(R.id.tvTransactionTitle);
+            TextView metaView = itemView.findViewById(R.id.tvTransactionMeta);
+            TextView amountView = itemView.findViewById(R.id.tvTransactionAmount);
+
+            boolean isExpense = "expense".equalsIgnoreCase(transaction.getType())
+                    || "chi".equalsIgnoreCase(transaction.getType());
+            String typeLabel = isExpense ? "Chi" : "Thu";
+            String categoryLabel = transaction.getCategory() == null ? "Khác" : transaction.getCategory();
+            String noteLabel = transaction.getNote();
+            if (noteLabel == null || noteLabel.trim().isEmpty()) {
+                noteLabel = "Không ghi chú";
+            }
+
+            titleView.setText(typeLabel + " • " + categoryLabel);
+            metaView.setText(noteLabel);
+            amountView.setText((isExpense ? "-" : "+") + TransactionStore.formatCurrency(transaction.getAmount()));
+            amountView.setTextColor(getColor(isExpense ? R.color.accent_red : R.color.accent_green));
+
+            transactionListContainer.addView(itemView);
+        }
+
+        transactionListContainer.setVisibility(View.VISIBLE);
+        tvNoTransactions.setVisibility(View.GONE);
+
+        if (total > 3) {
+            tvSeeAll.setVisibility(View.VISIBLE);
+            tvSeeAll.setText(showAllTransactions ? "Thu gọn" : "Xem tất cả");
+        } else {
+            tvSeeAll.setVisibility(View.GONE);
+        }
     }
 
     private void setupBarChart(long income, long expense) {
