@@ -134,11 +134,21 @@ public class MainActivity extends AppCompatActivity {
     private void updateDashboardFromStore() {
         long income = TransactionStore.getIncomeTotal(this);
         long expense = TransactionStore.getExpenseTotal(this);
-        long balance = income - expense;
+        updateDashboardTotals(income, expense);
+    }
 
+    private void updateDashboardTotals(long income, long expense) {
+        long balance = income - expense;
         tvIncome.setText(TransactionStore.formatCurrency(income));
         tvExpense.setText(TransactionStore.formatCurrency(expense));
         tvBalance.setText(TransactionStore.formatCurrency(balance));
+        setupBarChart(income, expense);
+    }
+
+    private void renderTransactions() {
+        if (cachedTransactions == null) {
+            cachedTransactions = Collections.emptyList();
+        }
 
         renderTransactions();
         setupBarChart(income, expense);
