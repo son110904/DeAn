@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,21 +23,23 @@ import com.github.mikephil.charting.components.YAxis;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
     TextView tvSeeAll;
     TextView tvNoTransactions;
     LinearLayout transactionListContainer;
-    private boolean showAllTransactions = false;
-    private List<TransactionResponse> transactions = new ArrayList<>();
+    private final List<TransactionResponse> allTransactions = new ArrayList<>();
+    private boolean isExpanded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        TransactionStore.ensureDemoData(this);
 
         // Ánh xạ view
         tvIncome = findViewById(R.id.tvIncome);
@@ -72,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tvSeeAll.setOnClickListener(v -> {
-            showAllTransactions = !showAllTransactions;
-            renderTransactionList();
+            isExpanded = !isExpanded;
+            renderTransactions();
         });
     }
 
@@ -85,6 +89,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDashboard() {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
+            @Override
+            public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    allTransactions.clear();
+                    allTransactions.addAll(response.body());
+                    TransactionStore.syncFromTransactions(MainActivity.this, allTransactions);
+                    updateDashboardFromTransactions(allTransactions);
+                } else {
+                    updateDashboardFromStore();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
+                updateDashboardFromStore();
+            }
+        });
+    }
+
+    private void updateDashboardFromTransactions(List<TransactionResponse> transactions) {
+        long income = 0L;
+        long expense = 0L;
+
+        for (TransactionResponse transaction : transactions) {
+            if ("income".equalsIgnoreCase(transaction.getType())) {
+                income += transaction.getAmount();
+            } else {
+                expense += transaction.getAmount();
+            }
+        }
+
+        long balance = income - expense;
+        tvIncome.setText(TransactionStore.formatCurrency(income));
+        tvExpense.setText(TransactionStore.formatCurrency(expense));
+        tvBalance.setText(TransactionStore.formatCurrency(balance));
+
+        renderTransactions();
+        setupBarChart(income, expense);
+    }
+
+    private void updateDashboardFromStore() {
         long income = TransactionStore.getIncomeTotal(this);
         long expense = TransactionStore.getExpenseTotal(this);
         long balance = income - expense;
@@ -93,85 +140,64 @@ public class MainActivity extends AppCompatActivity {
         tvExpense.setText(TransactionStore.formatCurrency(expense));
         tvBalance.setText(TransactionStore.formatCurrency(balance));
 
+        renderTransactions();
         setupBarChart(income, expense);
     }
 
-    private void loadTransactions() {
-        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
-        apiService.getTransactions().enqueue(new retrofit2.Callback<List<TransactionResponse>>() {
-            @Override
-            public void onResponse(retrofit2.Call<List<TransactionResponse>> call,
-                                   retrofit2.Response<List<TransactionResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    transactions = response.body();
-                    renderTransactionList();
-                } else {
-                    showTransactionError("Không lấy được dữ liệu giao dịch.");
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<List<TransactionResponse>> call, Throwable t) {
-                showTransactionError("Không kết nối được máy chủ.");
-            }
-        });
-    }
-
-    private void showTransactionError(String message) {
-        transactions = new ArrayList<>();
-        transactionListContainer.setVisibility(View.GONE);
-        tvNoTransactions.setVisibility(View.VISIBLE);
-        tvNoTransactions.setText(message);
-        tvSeeAll.setVisibility(View.GONE);
-    }
-
-    private void renderTransactionList() {
+    private void renderTransactions() {
         transactionListContainer.removeAllViews();
-        if (transactions == null || transactions.isEmpty()) {
-            transactionListContainer.setVisibility(View.GONE);
+
+        if (allTransactions.isEmpty()) {
             tvNoTransactions.setVisibility(View.VISIBLE);
-            tvNoTransactions.setText("Chưa có giao dịch nào. Hãy thêm giao dịch mới để hiển thị ở đây.");
             tvSeeAll.setVisibility(View.GONE);
             return;
         }
 
-        int total = transactions.size();
-        int displayCount = showAllTransactions ? total : Math.min(3, total);
-        for (int i = 0; i < displayCount; i++) {
-            TransactionResponse transaction = transactions.get(i);
-            View itemView = LayoutInflater.from(this)
-                    .inflate(R.layout.item_transaction, transactionListContainer, false);
+        tvNoTransactions.setVisibility(View.GONE);
+        int maxItems = isExpanded ? allTransactions.size() : Math.min(3, allTransactions.size());
+        List<TransactionResponse> visible = allTransactions.subList(0, maxItems);
 
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (TransactionResponse transaction : visible) {
+            View itemView = inflater.inflate(R.layout.item_transaction, transactionListContainer, false);
             TextView titleView = itemView.findViewById(R.id.tvTransactionTitle);
             TextView metaView = itemView.findViewById(R.id.tvTransactionMeta);
             TextView amountView = itemView.findViewById(R.id.tvTransactionAmount);
 
-            boolean isExpense = "expense".equalsIgnoreCase(transaction.getType())
-                    || "chi".equalsIgnoreCase(transaction.getType());
-            String typeLabel = isExpense ? "Chi" : "Thu";
-            String categoryLabel = transaction.getCategory() == null ? "Khác" : transaction.getCategory();
-            String noteLabel = transaction.getNote();
-            if (noteLabel == null || noteLabel.trim().isEmpty()) {
-                noteLabel = "Không ghi chú";
-            }
+            String type = transaction.getType();
+            boolean isIncome = "income".equalsIgnoreCase(type);
+            String category = transaction.getCategory() != null ? transaction.getCategory() : "";
+            String note = transaction.getNote() != null ? transaction.getNote() : "";
+            String dateLabel = formatDate(transaction.getCreatedAt());
 
-            titleView.setText(typeLabel + " • " + categoryLabel);
-            metaView.setText(noteLabel);
-            amountView.setText((isExpense ? "-" : "+") + TransactionStore.formatCurrency(transaction.getAmount()));
-            amountView.setTextColor(getColor(isExpense ? R.color.accent_red : R.color.accent_green));
+            titleView.setText(category.isEmpty() ? (isIncome ? "Thu nhập" : "Chi tiêu") : category);
+            String meta = note.isEmpty() ? dateLabel : note + " • " + dateLabel;
+            metaView.setText(meta);
+
+            String amountLabel = (isIncome ? "+ " : "- ") + TransactionStore.formatCurrency(transaction.getAmount());
+            amountView.setText(amountLabel);
+            amountView.setTextColor(getColor(isIncome ? R.color.accent_green : R.color.accent_red));
 
             transactionListContainer.addView(itemView);
         }
 
-        transactionListContainer.setVisibility(View.VISIBLE);
-        tvNoTransactions.setVisibility(View.GONE);
-
-        if (total > 3) {
+        if (allTransactions.size() > 3) {
             tvSeeAll.setVisibility(View.VISIBLE);
-            tvSeeAll.setText(showAllTransactions ? "Thu gọn" : "Xem tất cả");
+            tvSeeAll.setText(isExpanded ? "Thu gọn" : "Xem tất cả");
         } else {
             tvSeeAll.setVisibility(View.GONE);
         }
+    }
+
+    private String formatDate(String rawDate) {
+        if (rawDate == null || rawDate.isEmpty()) {
+            return "";
+        }
+        String[] parts = rawDate.split("T");
+        if (parts.length > 0 && !parts[0].isEmpty()) {
+            return parts[0];
+        }
+        return rawDate;
     }
 
     private void setupBarChart(long income, long expense) {
