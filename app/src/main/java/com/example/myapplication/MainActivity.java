@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -28,6 +30,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int PREVIEW_LIMIT = 3;
+
     TextView tvIncome, tvExpense, tvBalance;
     BarChart barChart;
     TextView tvSeeAll;

@@ -103,9 +103,39 @@ public class StatisticsActivity extends AppCompatActivity {
         });
     }
 
-    private void updateBudget() {
-        long incomeTotal = TransactionStore.getIncomeTotal(this);
-        long expenseTotal = TransactionStore.getExpenseTotal(this);
+    private void fetchTransactions() {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
+            @Override
+            public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    updateBudget(response.body());
+                } else {
+                    updateBudget(new java.util.ArrayList<>());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
+                updateBudget(new java.util.ArrayList<>());
+            }
+        });
+    }
+
+    private void updateBudget(List<TransactionResponse> transactions) {
+        long incomeTotal = 0L;
+        long expenseTotal = 0L;
+        Map<String, Long> categoryTotals = new HashMap<>();
+        for (TransactionResponse transaction : transactions) {
+            if ("income".equalsIgnoreCase(transaction.getType())) {
+                incomeTotal += transaction.getAmount();
+            } else {
+                expenseTotal += transaction.getAmount();
+                String categoryKey = TransactionStore.normalizeCategory(transaction.getCategory());
+                long current = categoryTotals.getOrDefault(categoryKey, 0L);
+                categoryTotals.put(categoryKey, current + transaction.getAmount());
+            }
+        }
         long remaining = incomeTotal - expenseTotal;
 
         tvBudgetExpenseTab.setText("Chi " + TransactionStore.formatCurrency(expenseTotal));
@@ -118,10 +148,10 @@ public class StatisticsActivity extends AppCompatActivity {
         tvBudgetPercent.setText(percent + "%");
         progressBudgetTotal.setProgress(percent);
 
-        renderCategories(incomeTotal);
+        renderCategories(incomeTotal, categoryTotals);
     }
 
-    private void renderCategories(long incomeTotal) {
+    private void renderCategories(long incomeTotal, Map<String, Long> categoryTotals) {
         budgetCategoryContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
         long defaultSum = 0L;
@@ -142,7 +172,7 @@ public class StatisticsActivity extends AppCompatActivity {
                     ? Math.round((category.defaultBudget / (float) defaultSum) * incomeTotal)
                     : category.defaultBudget;
 
-            long spent = TransactionStore.getCategoryTotal(this, category.getKey());
+            long spent = categoryTotals.getOrDefault(category.getKey(), 0L);
             long remaining = Math.max(0, budgetAmount - spent);
             int percent = budgetAmount > 0 ? Math.min(100, Math.round((spent * 100f) / budgetAmount)) : 0;
 
