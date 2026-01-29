@@ -215,4 +215,56 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
         return Long.parseLong(digits);
     }
+
+    private void submitTransaction(long amount, String account, String category) {
+        String categoryKey = isExpense ? TransactionStore.normalizeCategory(category) : "Thu nhập";
+        String type = isExpense ? "expense" : "income";
+        TransactionRequest payload = new TransactionRequest(
+                (int) amount,
+                categoryKey,
+                type,
+                account
+        );
+
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.createTransaction(payload).enqueue(new retrofit2.Callback<TransactionResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<TransactionResponse> call,
+                                   retrofit2.Response<TransactionResponse> response) {
+                if (response.isSuccessful()) {
+                    if (isExpense) {
+                        TransactionStore.addExpense(AddTransactionActivity.this, amount, account, categoryKey);
+                        Toast.makeText(AddTransactionActivity.this,
+                                "Đã lưu: Chi " + TransactionStore.formatCurrency(amount) + "\n" +
+                                        "Tài khoản: " + account + "\n" +
+                                        "Danh mục: " + categoryKey,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        TransactionStore.addIncome(AddTransactionActivity.this, amount, account);
+                        Toast.makeText(AddTransactionActivity.this,
+                                "Đã lưu: Thu " + TransactionStore.formatCurrency(amount) + "\n" +
+                                        "Tài khoản nhận: " + account,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    // Reset form
+                    edtAmount.setText("");
+                    rgType.clearCheck();
+                    spinnerCategory.setSelection(0);
+                    selectTransactionType(isExpense);
+                } else {
+                    Toast.makeText(AddTransactionActivity.this,
+                            "Không lưu được giao dịch lên máy chủ",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<TransactionResponse> call, Throwable t) {
+                Toast.makeText(AddTransactionActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

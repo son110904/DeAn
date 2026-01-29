@@ -247,7 +247,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Chưa có giao dịch. Vui lòng thêm giao dịch mới."
+                    android:text="Chưa có giao dịch nào. Hãy thêm giao dịch mới để hiển thị ở đây."
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 

@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -83,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateDashboard();
+        loadTransactions();
     }
 
     private void updateDashboard() {
