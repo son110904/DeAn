@@ -10,7 +10,7 @@ public class RetrofitClient {
     private RetrofitClient() {
     }
 
-    public static Retrofit getClient() {
+    public static Retrofit getInstance() {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
