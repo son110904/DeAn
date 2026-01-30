@@ -120,7 +120,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                     account
             );
 
-            ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+            ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
             apiService.createTransaction(request).enqueue(new Callback<TransactionResponse>() {
                 @Override
                 public void onResponse(Call<TransactionResponse> call, Response<TransactionResponse> response) {

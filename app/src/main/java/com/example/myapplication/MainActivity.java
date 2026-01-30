@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDashboard() {
-        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
         apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
             @Override
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
