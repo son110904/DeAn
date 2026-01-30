@@ -2,7 +2,6 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -42,14 +41,12 @@ public class TransactionsActivity extends AppCompatActivity {
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<TransactionResponse> transactions = response.body();
-                    Log.d("API", "Size: " + transactions.size());
                     adapter.submitList(transactions);
                     emptyState.setVisibility(transactions.isEmpty() ? View.VISIBLE : View.GONE);
                 } else {
                     Toast.makeText(TransactionsActivity.this,
                             "Không lấy được dữ liệu giao dịch",
                             Toast.LENGTH_SHORT).show();
-                    Log.e("API", "Failed to load transactions: " + response.code());
                     adapter.submitList(null);
                     emptyState.setVisibility(View.VISIBLE);
                 }
@@ -60,7 +57,6 @@ public class TransactionsActivity extends AppCompatActivity {
                 Toast.makeText(TransactionsActivity.this,
                         "Lỗi kết nối: " + t.getMessage(),
                         Toast.LENGTH_SHORT).show();
-                Log.e("API", "Request failed", t);
                 adapter.submitList(null);
                 emptyState.setVisibility(View.VISIBLE);
             }
