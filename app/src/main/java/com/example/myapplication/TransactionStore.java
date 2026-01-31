@@ -114,6 +114,10 @@ public class TransactionStore {
         return formatter.format(amount) + "đ";
     }
 
+    public static void clearAll(Context context) {
+        getPrefs(context).edit().clear().apply();
+    }
+
     private static SharedPreferences getPrefs(Context context) {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }

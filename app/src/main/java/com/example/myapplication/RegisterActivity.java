@@ -46,6 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            AuthStore.saveProfile(this, name, email);
             Toast.makeText(this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));
             finish();

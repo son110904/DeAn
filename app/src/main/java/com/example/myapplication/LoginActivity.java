@@ -35,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
+            AuthStore.setLoggedIn(this, true);
+            AuthStore.saveProfile(this, AuthStore.getName(this), email);
             startActivity(new Intent(this, MainActivity.class));
             finish();
         });

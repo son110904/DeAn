@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Quản lý chi tiêu</string>
     <string name="title_main">Tổng quan tài chính</string>
     <string name="total_income">Tổng thu: %1$dđ</string>
     <string name="total_expense">Tổng chi: %1$dđ</string>
