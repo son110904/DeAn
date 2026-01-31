@@ -37,6 +37,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     RadioButton rbBank;
     RadioButton rbCredit;
     RadioButton rbCash;
+    EditText edtNote;
+    EditText edtDate;
 
     boolean isExpense = true;
 
@@ -57,6 +59,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         rbBank = findViewById(R.id.rbBank);
         rbCredit = findViewById(R.id.rbCredit);
         rbCash = findViewById(R.id.rbCash);
+        edtNote = findViewById(R.id.edtNote);
+        edtDate = findViewById(R.id.edtDate);
 
         // Thiết lập spinner categories
         setupCategorySpinner();
@@ -86,6 +90,10 @@ public class AddTransactionActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ForecastActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
+            } else if (id == R.id.menu_profile) {
+                startActivity(new Intent(this, ProfileActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
             }
 
             return false;
@@ -105,6 +113,9 @@ public class AddTransactionActivity extends AppCompatActivity {
             RadioButton rb = findViewById(checkedId);
             String account = rb.getText().toString();
             String category = spinnerCategory.getSelectedItem().toString();
+            String note = edtNote.getText().toString().trim();
+            String date = edtDate.getText().toString().trim();
+            String notePayload = buildNotePayload(note, date, account);
 
             if (isExpense && DEFAULT_CATEGORY.equals(category)) {
                 Toast.makeText(this, "Vui lòng chọn danh mục", Toast.LENGTH_SHORT).show();
@@ -117,7 +128,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                     (int) amount,
                     requestCategory,
                     type,
-                    account
+                    notePayload
             );
 
             ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
@@ -127,9 +138,9 @@ public class AddTransactionActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         if (isExpense) {
                             String categoryKey = TransactionStore.normalizeCategory(category);
-                            TransactionStore.addExpense(AddTransactionActivity.this, amount, account, categoryKey);
+                            TransactionStore.addExpense(AddTransactionActivity.this, amount, notePayload, categoryKey);
                         } else {
-                            TransactionStore.addIncome(AddTransactionActivity.this, amount, account);
+                            TransactionStore.addIncome(AddTransactionActivity.this, amount, notePayload);
                         }
                         Toast.makeText(AddTransactionActivity.this,
                                 "Đã lưu giao dịch",
@@ -138,6 +149,8 @@ public class AddTransactionActivity extends AppCompatActivity {
                         edtAmount.setText("");
                         rgType.clearCheck();
                         spinnerCategory.setSelection(0);
+                        edtNote.setText("");
+                        edtDate.setText("");
                         selectTransactionType(isExpense);
                     } else {
                         Toast.makeText(AddTransactionActivity.this,
@@ -214,5 +227,25 @@ public class AddTransactionActivity extends AppCompatActivity {
             return 0L;
         }
         return Long.parseLong(digits);
+    }
+
+    private String buildNotePayload(String note, String date, String account) {
+        StringBuilder builder = new StringBuilder();
+        if (note != null && !note.isEmpty()) {
+            builder.append(note);
+        }
+        if (date != null && !date.isEmpty()) {
+            if (builder.length() > 0) {
+                builder.append(" • ");
+            }
+            builder.append(date);
+        }
+        if (account != null && !account.isEmpty()) {
+            if (builder.length() > 0) {
+                builder.append(" • ");
+            }
+            builder.append(account);
+        }
+        return builder.toString();
     }
 }

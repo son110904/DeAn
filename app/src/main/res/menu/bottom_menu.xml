@@ -21,4 +21,9 @@
         android:icon="@android:drawable/ic_menu_compass"
         android:title="Dự đoán"/>
 
+    <item
+        android:id="@+id/menu_profile"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Hồ sơ"/>
+
 </menu>

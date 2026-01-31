@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Quản lý thời gian và tiền bạc"
+            android:text="Đăng nhập"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Theo dõi tài chính và đạt mục tiêu của bạn"
+            android:text="Chào mừng bạn quay trở lại"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:gravity="center" />

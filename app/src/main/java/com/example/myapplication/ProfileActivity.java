@@ -2,34 +2,41 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class ForecastActivity extends AppCompatActivity {
-
-    TextView tvForecast;
-    BottomNavigationView bottomNav;
-
+public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forecast);
+        setContentView(R.layout.activity_profile);
 
-        tvForecast = findViewById(R.id.tvForecast);
-        bottomNav = findViewById(R.id.bottomNav);
+        TextView tvName = findViewById(R.id.tvProfileName);
+        TextView tvEmail = findViewById(R.id.tvProfileEmail);
+        Button btnLogout = findViewById(R.id.btnLogout);
+        Button btnSettings = findViewById(R.id.btnSettings);
 
-        tvForecast.setText("Chưa có dữ liệu");
+        tvName.setText(AuthStore.getName(this));
+        tvEmail.setText(AuthStore.getEmail(this));
 
-        // Đánh dấu tab hiện tại
-        bottomNav.setSelectedItemId(R.id.menu_forecast);
+        btnSettings.setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class))
+        );
 
-        // Điều hướng
+        btnLogout.setOnClickListener(v -> {
+            AuthStore.clear(this);
+            startActivity(new Intent(this, LoginActivity.class));
+            finishAffinity();
+        });
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.menu_profile);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-
             if (id == R.id.menu_home) {
                 startActivity(new Intent(this, MainActivity.class));
                 overridePendingTransition(0, 0);
@@ -43,13 +50,12 @@ public class ForecastActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (id == R.id.menu_forecast) {
-                return true;
-            } else if (id == R.id.menu_profile) {
-                startActivity(new Intent(this, ProfileActivity.class));
+                startActivity(new Intent(this, ForecastActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
+            } else if (id == R.id.menu_profile) {
+                return true;
             }
-
             return false;
         });
     }

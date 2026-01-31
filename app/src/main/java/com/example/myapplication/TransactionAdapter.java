@@ -31,6 +31,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 ? item.getCategory()
                 : "Khác";
         String note = item.getNote();
+        String dateLabel = formatDate(item.getCreatedAt());
 
         holder.title.setText(category);
         String prefix = isExpense ? "- " : "+ ";
@@ -40,13 +41,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 : holder.itemView.getContext().getColor(R.color.accent_green);
         holder.amount.setTextColor(amountColor);
 
-        String subtitle;
+        StringBuilder subtitle = new StringBuilder(isExpense ? "Chi" : "Thu");
         if (note != null && !note.isEmpty()) {
-            subtitle = (isExpense ? "Chi" : "Thu") + " • " + note;
-        } else {
-            subtitle = isExpense ? "Chi" : "Thu";
+            subtitle.append(" • ").append(note);
         }
-        holder.subtitle.setText(subtitle);
+        if (!dateLabel.isEmpty()) {
+            subtitle.append(" • ").append(dateLabel);
+        }
+        holder.subtitle.setText(subtitle.toString());
     }
 
     @Override
@@ -73,5 +75,16 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             amount = itemView.findViewById(R.id.tvTransactionAmount);
             subtitle = itemView.findViewById(R.id.tvTransactionMeta);
         }
+    }
+
+    private String formatDate(String rawDate) {
+        if (rawDate == null || rawDate.isEmpty()) {
+            return "";
+        }
+        String[] parts = rawDate.split("T");
+        if (parts.length > 0 && !parts[0].isEmpty()) {
+            return parts[0];
+        }
+        return rawDate;
     }
 }
