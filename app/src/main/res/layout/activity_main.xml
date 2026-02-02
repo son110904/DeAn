@@ -28,7 +28,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/main_greeting_title"
+                    android:text="@string/main_title"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -48,14 +48,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_summary_gradient"
+                    android:background="@drawable/bg_gradient_primary"
                     android:orientation="vertical"
                     android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/main_balance_label"
+                        android:text="@string/main_balance_title"
                         android:textColor="@color/white"
                         android:textSize="13sp" />
 
@@ -64,7 +64,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/currency_placeholder"
+                        android:text="@string/placeholder_currency_zero"
                         android:textColor="@color/white"
                         android:textSize="36sp"
                         android:textStyle="bold" />
@@ -93,7 +93,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/main_income_label"
+                        android:text="@string/main_income_month"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -102,7 +102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/currency_placeholder"
+                        android:text="@string/placeholder_currency_zero"
                         android:textColor="@color/accent_green"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -122,7 +122,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/main_expense_label"
+                        android:text="@string/main_expense_month"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -131,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/currency_placeholder"
+                        android:text="@string/placeholder_currency_zero"
                         android:textColor="@color/accent_red"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -152,7 +152,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/main_month_balance_label"
+                    android:text="@string/main_balance_month"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />

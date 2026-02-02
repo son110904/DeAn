@@ -17,7 +17,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="20dp"
-            android:contentDescription="@string/content_description_logo"
+            android:contentDescription="@string/login_logo_desc"
             android:src="@drawable/ic_coin" />
 
         <TextView
@@ -52,7 +52,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/register_name_label"
+                android:text="@string/register_full_name_label"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -63,7 +63,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_pill"
-                android:hint="@string/register_name_hint"
+                android:hint="@string/register_full_name_hint"
                 android:inputType="textPersonName"
                 android:paddingHorizontal="16dp"
                 android:textColor="@color/text_primary"
@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/register_email_label"
+                android:text="@string/login_email_label"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -85,7 +85,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_pill"
-                android:hint="@string/register_email_hint"
+                android:hint="@string/login_email_hint"
                 android:inputType="textEmailAddress"
                 android:paddingHorizontal="16dp"
                 android:textColor="@color/text_primary"
@@ -118,7 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="@string/register_password_min"
+                android:text="@string/register_password_note"
                 android:textColor="@color/text_light"
                 android:textSize="11sp" />
 
@@ -149,7 +149,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_marginTop="24dp"
-                android:backgroundTint="@color/primary_blue"
+                android:background="@drawable/bg_button_primary"
                 android:text="@string/register_button"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
@@ -162,7 +162,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/register_go_login"
+            android:text="@string/register_login_prompt"
             android:textColor="@color/primary_blue"
             android:textSize="14sp"
             android:textStyle="bold" />

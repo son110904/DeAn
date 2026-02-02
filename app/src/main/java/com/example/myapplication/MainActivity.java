@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -180,17 +180,19 @@ public class MainActivity extends AppCompatActivity {
             String note = transaction.getNote() != null ? transaction.getNote() : "";
             String dateLabel = formatDate(transaction.getCreatedAt());
 
-            titleView.setText(category.isEmpty()
-                    ? (isIncome ? getString(R.string.transaction_title_income)
-                    : getString(R.string.transaction_title_expense))
-                    : category);
-            String meta = note.isEmpty() ? dateLabel : note + " • " + dateLabel;
+            String fallbackTitle = isIncome
+                    ? getString(R.string.transaction_income_default)
+                    : getString(R.string.transaction_expense_default);
+            titleView.setText(category.isEmpty() ? fallbackTitle : category);
+            String meta = note.isEmpty()
+                    ? dateLabel
+                    : note + getString(R.string.separator_dot) + dateLabel;
             metaView.setText(meta);
 
-            String amountLabel = (isIncome
-                    ? getString(R.string.transaction_prefix_income)
-                    : getString(R.string.transaction_prefix_expense))
-                    + TransactionStore.formatCurrency(transaction.getAmount());
+            String amountValue = TransactionStore.formatCurrency(transaction.getAmount());
+            String amountLabel = isIncome
+                    ? getString(R.string.amount_prefix_income, amountValue)
+                    : getString(R.string.amount_prefix_expense, amountValue);
             amountView.setText(amountLabel);
             amountView.setTextColor(getColor(isIncome ? R.color.accent_green : R.color.accent_red));
 
@@ -227,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (entries.isEmpty()) {
             barChart.clear();
-            barChart.setNoDataText(getString(R.string.main_chart_no_data));
+            barChart.setNoDataText(getString(R.string.chart_no_data));
             barChart.invalidate();
             return;
         }
@@ -236,8 +238,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Màu sắc theo style mới
         dataSet.setColors(
-                Color.parseColor("#5B8FF9"),
-                Color.parseColor("#E8684A")
+                ContextCompat.getColor(this, R.color.chart_blue),
+                ContextCompat.getColor(this, R.color.chart_red)
         );
 
         dataSet.setValueTextSize(0f); // Ẩn giá trị trên cột
@@ -262,8 +264,8 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setDrawAxisLine(true);
-        xAxis.setTextColor(Color.parseColor("#8E8E93"));
-        xAxis.setAxisLineColor(Color.parseColor("#ECF0F1"));
+        xAxis.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        xAxis.setAxisLineColor(ContextCompat.getColor(this, R.color.divider_light));
         xAxis.setGranularity(1f);
         xAxis.setLabelCount(entries.size());
         xAxis.setDrawLabels(false);
@@ -272,8 +274,8 @@ public class MainActivity extends AppCompatActivity {
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
         leftAxis.setDrawAxisLine(false);
-        leftAxis.setTextColor(Color.parseColor("#8E8E93"));
-        leftAxis.setGridColor(Color.parseColor("#ECF0F1"));
+        leftAxis.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        leftAxis.setGridColor(ContextCompat.getColor(this, R.color.divider_light));
         leftAxis.setAxisMinimum(0f);
 
         // Trục Y phải

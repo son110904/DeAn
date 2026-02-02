@@ -37,17 +37,17 @@ public class RegisterActivity extends AppCompatActivity {
             String confirm = edtRegisterConfirm.getText().toString().trim();
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
-                Toast.makeText(this, getString(R.string.error_missing_info), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_register_missing), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!password.equals(confirm)) {
-                Toast.makeText(this, getString(R.string.register_password_mismatch), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_register_mismatch), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             AuthStore.saveProfile(this, name, email);
-            Toast.makeText(this, getString(R.string.register_success), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_register_success), Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         });

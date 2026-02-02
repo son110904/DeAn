@@ -45,7 +45,7 @@ public class TransactionsActivity extends AppCompatActivity {
                     emptyState.setVisibility(transactions.isEmpty() ? View.VISIBLE : View.GONE);
                 } else {
                     Toast.makeText(TransactionsActivity.this,
-                            getString(R.string.transactions_fetch_failed),
+                            getString(R.string.toast_transactions_failed),
                             Toast.LENGTH_SHORT).show();
                     adapter.submitList(null);
                     emptyState.setVisibility(View.VISIBLE);
@@ -55,7 +55,7 @@ public class TransactionsActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
                 Toast.makeText(TransactionsActivity.this,
-                        getString(R.string.toast_connection_error_format, t.getMessage()),
+                        getString(R.string.toast_connection_error, t.getMessage()),
                         Toast.LENGTH_SHORT).show();
                 adapter.submitList(null);
                 emptyState.setVisibility(View.VISIBLE);

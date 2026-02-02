@@ -37,7 +37,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/forecast_subtitle"
+                    android:text="@string/forecast_description_text"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:lineSpacingExtra="4dp" />
@@ -56,7 +56,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/forecast_month_label"
+                    android:text="@string/forecast_next_month"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
@@ -65,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="@string/forecast_no_data"
+                    android:text="@string/forecast_empty"
                     android:textColor="@color/text_primary"
                     android:textSize="36sp"
                     android:textStyle="bold" />
@@ -85,7 +85,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/forecast_trend_label"
+                    android:text="@string/forecast_trend_title"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -100,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="@string/forecast_chart_note"
+                    android:text="@string/forecast_trend_note"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>

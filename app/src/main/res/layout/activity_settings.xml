@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_language_label"
+                android:text="@string/settings_language_title"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/settings_theme_label"
+                android:text="@string/settings_interface_title"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -61,14 +61,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="@string/settings_theme_dark"
+                android:text="@string/settings_dark_mode"
                 android:textColor="@color/text_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/settings_data_label"
+                android:text="@string/settings_data_title"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -79,7 +79,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="@color/accent_red"
-                android:text="@string/settings_clear_button"
+                android:text="@string/settings_clear_data_button"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="14sp" />

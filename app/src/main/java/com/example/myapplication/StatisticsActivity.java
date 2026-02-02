@@ -135,7 +135,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void applyBudgetSummary(long incomeTotal, long expenseTotal, Map<String, Long> categoryTotals, long remaining) {
-        tvBudgetExpenseTab.setText(getString(R.string.statistics_expense_tab_format,
+        tvBudgetExpenseTab.setText(getString(R.string.statistics_expense_tab_amount,
                 TransactionStore.formatCurrency(expenseTotal)));
         tvBudgetRemaining.setText(TransactionStore.formatCurrency(remaining));
         tvBudgetTotal.setText(TransactionStore.formatCurrency(incomeTotal));
@@ -154,7 +154,7 @@ public class StatisticsActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         if (expenseTotal <= 0 || categoryTotals.isEmpty()) {
             TextView emptyView = new TextView(this);
-            emptyView.setText(getString(R.string.statistics_empty_categories));
+            emptyView.setText(getString(R.string.statistics_no_category));
             emptyView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
             emptyView.setTextSize(14);
             int padding = dpToPx(16);
@@ -182,9 +182,9 @@ public class StatisticsActivity extends AppCompatActivity {
             int percent = expenseTotal > 0 ? Math.min(100, Math.round((spent * 100f) / expenseTotal)) : 0;
 
             nameView.setText(entry.getKey());
-            amountView.setText(getString(R.string.statistics_category_share_label));
+            amountView.setText(getString(R.string.statistics_weighted_label));
             percentView.setText(getString(R.string.percent_format, percent));
-            spentView.setText(getString(R.string.statistics_spent_format, TransactionStore.formatCurrency(spent)));
+            spentView.setText(getString(R.string.statistics_spent_prefix, TransactionStore.formatCurrency(spent)));
             progressBar.setProgress(percent);
 
             budgetCategoryContainer.addView(itemView);

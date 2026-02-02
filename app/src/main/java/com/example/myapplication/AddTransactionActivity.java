@@ -106,7 +106,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             int checkedId = rgType.getCheckedRadioButtonId();
 
             if (amount <= 0 || checkedId == -1) {
-                Toast.makeText(this, getString(R.string.error_missing_info), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_add_missing), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -117,13 +117,13 @@ public class AddTransactionActivity extends AppCompatActivity {
             String date = edtDate.getText().toString().trim();
             String notePayload = buildNotePayload(note, date, account);
 
-            if (isExpense && defaultCategory.equals(category)) {
-                Toast.makeText(this, getString(R.string.add_transaction_select_category), Toast.LENGTH_SHORT).show();
+            if (isExpense && getString(R.string.transaction_category_placeholder).equals(category)) {
+                Toast.makeText(this, getString(R.string.toast_add_missing_category), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             String type = isExpense ? "expense" : "income";
-            String requestCategory = isExpense ? category : getString(R.string.transaction_title_income);
+            String requestCategory = isExpense ? category : getString(R.string.transaction_income_default);
             TransactionRequest request = new TransactionRequest(
                     (int) amount,
                     requestCategory,
@@ -143,7 +143,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                             TransactionStore.addIncome(AddTransactionActivity.this, amount, notePayload);
                         }
                         Toast.makeText(AddTransactionActivity.this,
-                                getString(R.string.add_transaction_saved),
+                                getString(R.string.toast_add_success),
                                 Toast.LENGTH_SHORT).show();
 
                         edtAmount.setText("");
@@ -154,7 +154,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                         selectTransactionType(isExpense);
                     } else {
                         Toast.makeText(AddTransactionActivity.this,
-                                getString(R.string.add_transaction_failed),
+                                getString(R.string.toast_add_failed),
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -162,7 +162,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<TransactionResponse> call, Throwable t) {
                     Toast.makeText(AddTransactionActivity.this,
-                            getString(R.string.toast_connection_error_format, t.getMessage()),
+                            getString(R.string.toast_connection_error, t.getMessage()),
                             Toast.LENGTH_SHORT).show();
                 }
             });
@@ -171,12 +171,10 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void setupCategorySpinner() {
         // Danh sách categories
-        String[] categories = getResources().getStringArray(R.array.expense_categories);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
-                android.R.layout.simple_spinner_item,
-                categories
+                R.array.transaction_categories,
+                android.R.layout.simple_spinner_item
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategory.setAdapter(adapter);
@@ -225,13 +223,13 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
         if (date != null && !date.isEmpty()) {
             if (builder.length() > 0) {
-                builder.append(" • ");
+                builder.append(getString(R.string.separator_dot));
             }
             builder.append(date);
         }
         if (account != null && !account.isEmpty()) {
             if (builder.length() > 0) {
-                builder.append(" • ");
+                builder.append(getString(R.string.separator_dot));
             }
             builder.append(account);
         }

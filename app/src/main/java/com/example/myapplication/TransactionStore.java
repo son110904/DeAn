@@ -76,15 +76,21 @@ public class TransactionStore {
             if (!transactions.isEmpty()) {
                 TransactionResponse latest = transactions.get(transactions.size() - 1);
                 String label = "income".equalsIgnoreCase(latest.getType())
-                        ? context.getString(R.string.transaction_label_income)
-                        : context.getString(R.string.transaction_label_expense);
+                        ? context.getString(R.string.transaction_income_label)
+                        : context.getString(R.string.transaction_expense_label);
                 String category = latest.getCategory();
                 String note = latest.getNote();
-                String detail = category != null && !category.isEmpty() ? " • " + category : "";
+                String separator = context.getString(R.string.separator_dot);
+                String detail = category != null && !category.isEmpty() ? separator + category : "";
                 if (note != null && !note.isEmpty()) {
-                    detail += " • " + note;
+                    detail += separator + note;
                 }
-                lastTransaction = label + " " + formatCurrency(latest.getAmount()) + detail;
+                lastTransaction = context.getString(
+                        R.string.transaction_summary,
+                        label,
+                        formatCurrency(latest.getAmount()),
+                        detail
+                );
             }
         }
 
@@ -101,12 +107,17 @@ public class TransactionStore {
         SharedPreferences prefs = getPrefs(context);
         long incomeTotal = prefs.getLong(KEY_INCOME_TOTAL, 0L) + amount;
 
+        String separator = context.getString(R.string.separator_dot);
+        String detail = separator + account;
         prefs.edit()
                 .putLong(KEY_INCOME_TOTAL, incomeTotal)
                 .putString(KEY_LAST_TRANSACTION,
-                        context.getString(R.string.last_transaction_income_format,
+                        context.getString(
+                                R.string.transaction_summary,
+                                context.getString(R.string.transaction_income_label),
                                 formatCurrency(amount),
-                                account))
+                                detail
+                        ))
                 .apply();
     }
 
@@ -115,20 +126,24 @@ public class TransactionStore {
         long expenseTotal = prefs.getLong(KEY_EXPENSE_TOTAL, 0L) + amount;
         long categoryTotal = prefs.getLong(KEY_CATEGORY_PREFIX + categoryKey, 0L) + amount;
 
+        String separator = context.getString(R.string.separator_dot);
+        String detail = separator + categoryKey + separator + account;
         prefs.edit()
                 .putLong(KEY_EXPENSE_TOTAL, expenseTotal)
                 .putLong(KEY_CATEGORY_PREFIX + categoryKey, categoryTotal)
                 .putString(KEY_LAST_TRANSACTION,
-                        context.getString(R.string.last_transaction_expense_format,
+                        context.getString(
+                                R.string.transaction_summary,
+                                context.getString(R.string.transaction_expense_label),
                                 formatCurrency(amount),
-                                categoryKey,
-                                account))
+                                detail
+                        ))
                 .apply();
     }
 
     public static String normalizeCategory(Context context, String categoryLabel) {
         if (categoryLabel == null) {
-            return context.getString(R.string.transaction_other_label);
+            return context.getString(R.string.transaction_unknown_category);
         }
         String normalized = categoryLabel.replaceAll("^[^\\p{L}\\p{N}]+", "").trim();
         if (normalized.isEmpty()) {
