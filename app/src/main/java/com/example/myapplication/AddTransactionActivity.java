@@ -23,8 +23,6 @@ import retrofit2.Response;
 
 public class AddTransactionActivity extends AppCompatActivity {
 
-    private static final String DEFAULT_CATEGORY = "Chọn danh mục";
-
     EditText edtAmount;
     RadioGroup rgType;
     Button btnSave;
@@ -106,7 +104,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             int checkedId = rgType.getCheckedRadioButtonId();
 
             if (amount <= 0 || checkedId == -1) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_add_missing), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -117,13 +115,13 @@ public class AddTransactionActivity extends AppCompatActivity {
             String date = edtDate.getText().toString().trim();
             String notePayload = buildNotePayload(note, date, account);
 
-            if (isExpense && DEFAULT_CATEGORY.equals(category)) {
-                Toast.makeText(this, "Vui lòng chọn danh mục", Toast.LENGTH_SHORT).show();
+            if (isExpense && getString(R.string.transaction_category_placeholder).equals(category)) {
+                Toast.makeText(this, getString(R.string.toast_add_missing_category), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             String type = isExpense ? "expense" : "income";
-            String requestCategory = isExpense ? category : "Thu nhập";
+            String requestCategory = isExpense ? category : getString(R.string.transaction_income_default);
             TransactionRequest request = new TransactionRequest(
                     (int) amount,
                     requestCategory,
@@ -137,13 +135,13 @@ public class AddTransactionActivity extends AppCompatActivity {
                 public void onResponse(Call<TransactionResponse> call, Response<TransactionResponse> response) {
                     if (response.isSuccessful()) {
                         if (isExpense) {
-                            String categoryKey = TransactionStore.normalizeCategory(category);
+                            String categoryKey = TransactionStore.normalizeCategory(AddTransactionActivity.this, category);
                             TransactionStore.addExpense(AddTransactionActivity.this, amount, notePayload, categoryKey);
                         } else {
                             TransactionStore.addIncome(AddTransactionActivity.this, amount, notePayload);
                         }
                         Toast.makeText(AddTransactionActivity.this,
-                                "Đã lưu giao dịch",
+                                getString(R.string.toast_add_success),
                                 Toast.LENGTH_SHORT).show();
 
                         edtAmount.setText("");
@@ -154,7 +152,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                         selectTransactionType(isExpense);
                     } else {
                         Toast.makeText(AddTransactionActivity.this,
-                                "Không thể lưu giao dịch",
+                                getString(R.string.toast_add_failed),
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -162,7 +160,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<TransactionResponse> call, Throwable t) {
                     Toast.makeText(AddTransactionActivity.this,
-                            "Lỗi kết nối: " + t.getMessage(),
+                            getString(R.string.toast_connection_error, t.getMessage()),
                             Toast.LENGTH_SHORT).show();
                 }
             });
@@ -171,23 +169,10 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void setupCategorySpinner() {
         // Danh sách categories
-        String[] categories = {
-                DEFAULT_CATEGORY,
-                "🍜 Ăn uống",
-                "🚗 Giao thông vận tải",
-                "🏠 Nhà ở",
-                "🎮 Giải trí",
-                "🛒 Mua sắm",
-                "💊 Y tế",
-                "📚 Giáo dục",
-                "🖼️ Sở thích",
-                "💰 Khác"
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
-                android.R.layout.simple_spinner_item,
-                categories
+                R.array.transaction_categories,
+                android.R.layout.simple_spinner_item
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategory.setAdapter(adapter);
@@ -201,7 +186,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             btnNewExpense.setTextColor(getColor(R.color.primary_blue));
             btnNewIncome.setBackgroundResource(android.R.color.transparent);
             btnNewIncome.setTextColor(getColor(R.color.text_secondary));
-            tvAccountLabel.setText("Từ tài khoản");
+            tvAccountLabel.setText(getString(R.string.add_transaction_account_from));
             categorySection.setVisibility(View.VISIBLE);
             rbCredit.setVisibility(View.VISIBLE);
         } else {
@@ -209,7 +194,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             btnNewIncome.setTextColor(getColor(R.color.primary_blue));
             btnNewExpense.setBackgroundResource(android.R.color.transparent);
             btnNewExpense.setTextColor(getColor(R.color.text_secondary));
-            tvAccountLabel.setText("Thu về");
+            tvAccountLabel.setText(getString(R.string.add_transaction_account_to));
             categorySection.setVisibility(View.GONE);
             rbCredit.setVisibility(View.GONE);
             if (rbCredit.isChecked()) {
@@ -236,13 +221,13 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
         if (date != null && !date.isEmpty()) {
             if (builder.length() > 0) {
-                builder.append(" • ");
+                builder.append(getString(R.string.separator_dot));
             }
             builder.append(date);
         }
         if (account != null && !account.isEmpty()) {
             if (builder.length() > 0) {
-                builder.append(" • ");
+                builder.append(getString(R.string.separator_dot));
             }
             builder.append(account);
         }
