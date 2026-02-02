@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cài đặt"
+            android:text="@string/settings_title"
             android:textColor="@color/text_primary"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ngôn ngữ"
+                android:text="@string/settings_language_label"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -42,7 +42,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="@color/pill_background"
-                android:text="Đổi ngôn ngữ"
+                android:text="@string/settings_language_button"
                 android:textAllCaps="false"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Giao diện"
+                android:text="@string/settings_theme_label"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -61,14 +61,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Chế độ tối"
+                android:text="@string/settings_theme_dark"
                 android:textColor="@color/text_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Dữ liệu"
+                android:text="@string/settings_data_label"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -79,7 +79,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="@color/accent_red"
-                android:text="Xóa dữ liệu cục bộ"
+                android:text="@string/settings_clear_button"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="14sp" />

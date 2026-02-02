@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PREVIEW_LIMIT = 3;
 
     TextView tvIncome, tvExpense, tvBalance;
+    TextView tvGreetingName;
     BarChart barChart;
     TextView tvSeeAll;
     TextView tvNoTransactions;
@@ -45,10 +46,12 @@ public class MainActivity extends AppCompatActivity {
         tvIncome = findViewById(R.id.tvIncome);
         tvExpense = findViewById(R.id.tvExpense);
         tvBalance = findViewById(R.id.tvBalance);
+        tvGreetingName = findViewById(R.id.tvGreetingName);
         barChart = findViewById(R.id.barChart);
         tvSeeAll = findViewById(R.id.tvSeeAll);
         tvNoTransactions = findViewById(R.id.tvNoTransactions);
         transactionListContainer = findViewById(R.id.transactionListContainer);
+        tvGreetingName.setText(AuthStore.getName(this));
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        tvGreetingName.setText(AuthStore.getName(this));
         updateDashboard();
     }
 
@@ -176,11 +180,17 @@ public class MainActivity extends AppCompatActivity {
             String note = transaction.getNote() != null ? transaction.getNote() : "";
             String dateLabel = formatDate(transaction.getCreatedAt());
 
-            titleView.setText(category.isEmpty() ? (isIncome ? "Thu nhập" : "Chi tiêu") : category);
+            titleView.setText(category.isEmpty()
+                    ? (isIncome ? getString(R.string.transaction_title_income)
+                    : getString(R.string.transaction_title_expense))
+                    : category);
             String meta = note.isEmpty() ? dateLabel : note + " • " + dateLabel;
             metaView.setText(meta);
 
-            String amountLabel = (isIncome ? "+ " : "- ") + TransactionStore.formatCurrency(transaction.getAmount());
+            String amountLabel = (isIncome
+                    ? getString(R.string.transaction_prefix_income)
+                    : getString(R.string.transaction_prefix_expense))
+                    + TransactionStore.formatCurrency(transaction.getAmount());
             amountView.setText(amountLabel);
             amountView.setTextColor(getColor(isIncome ? R.color.accent_green : R.color.accent_red));
 
@@ -189,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (allTransactions.size() > PREVIEW_LIMIT) {
             tvSeeAll.setVisibility(View.VISIBLE);
-            tvSeeAll.setText(isExpanded ? "Thu gọn" : "Xem tất cả");
+            tvSeeAll.setText(isExpanded ? getString(R.string.main_collapse) : getString(R.string.main_see_all));
         } else {
             tvSeeAll.setVisibility(View.GONE);
         }
@@ -217,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (entries.isEmpty()) {
             barChart.clear();
-            barChart.setNoDataText("Chưa có dữ liệu biểu đồ.");
+            barChart.setNoDataText(getString(R.string.main_chart_no_data));
             barChart.invalidate();
             return;
         }

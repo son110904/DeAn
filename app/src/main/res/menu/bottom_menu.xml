@@ -4,26 +4,26 @@
     <item
         android:id="@+id/menu_home"
         android:icon="@android:drawable/ic_menu_view"
-        android:title="Trang chủ"/>
+        android:title="@string/nav_home"/>
 
     <item
         android:id="@+id/menu_add"
         android:icon="@android:drawable/ic_input_add"
-        android:title="Thêm"/>
+        android:title="@string/nav_add"/>
 
     <item
         android:id="@+id/menu_stats"
         android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Thống kê"/>
+        android:title="@string/nav_stats"/>
 
     <item
         android:id="@+id/menu_forecast"
         android:icon="@android:drawable/ic_menu_compass"
-        android:title="Dự đoán"/>
+        android:title="@string/nav_forecast"/>
 
     <item
         android:id="@+id/menu_profile"
         android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Hồ sơ"/>
+        android:title="@string/nav_profile"/>
 
 </menu>

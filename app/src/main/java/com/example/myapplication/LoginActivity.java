@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
             String password = edtLoginPassword.getText().toString().trim();
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.login_missing_fields), Toast.LENGTH_SHORT).show();
                 return;
             }
 
