@@ -9,9 +9,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +24,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class StatisticsActivity extends AppCompatActivity {
-
-    private static final BudgetCategory[] DEFAULT_CATEGORIES = new BudgetCategory[]{
-            new BudgetCategory("🍜 Ăn uống", 500_000),
-            new BudgetCategory("🎮 Giải trí", 300_000),
-            new BudgetCategory("🚗 Giao thông vận tải", 140_000),
-            new BudgetCategory("🖼️ Sở thích", 30_000)
-    };
 
     TextView tvBudgetExpenseTab;
     TextView tvBudgetRemaining;
@@ -133,11 +129,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private void updateBudgetFromStore() {
         long incomeTotal = TransactionStore.getIncomeTotal(this);
         long expenseTotal = TransactionStore.getExpenseTotal(this);
-        Map<String, Long> categoryTotals = new HashMap<>();
-        for (BudgetCategory category : DEFAULT_CATEGORIES) {
-            String key = category.getKey();
-            categoryTotals.put(key, TransactionStore.getCategoryTotal(this, key));
-        }
+        Map<String, Long> categoryTotals = TransactionStore.getCategoryTotals(this);
         long remaining = incomeTotal - expenseTotal;
         applyBudgetSummary(incomeTotal, expenseTotal, categoryTotals, remaining);
     }
@@ -153,56 +145,53 @@ public class StatisticsActivity extends AppCompatActivity {
         tvBudgetPercent.setText(percent + "%");
         progressBudgetTotal.setProgress(percent);
 
-        renderCategories(incomeTotal, categoryTotals);
+        renderCategories(expenseTotal, categoryTotals);
     }
 
-    private void renderCategories(long incomeTotal, Map<String, Long> categoryTotals) {
+    private void renderCategories(long expenseTotal, Map<String, Long> categoryTotals) {
         budgetCategoryContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
-        long defaultSum = 0L;
-        for (BudgetCategory category : DEFAULT_CATEGORIES) {
-            defaultSum += category.defaultBudget;
+        if (expenseTotal <= 0 || categoryTotals.isEmpty()) {
+            TextView emptyView = new TextView(this);
+            emptyView.setText("Chưa có chi tiêu theo danh mục.");
+            emptyView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+            emptyView.setTextSize(14);
+            int padding = dpToPx(16);
+            emptyView.setPadding(padding, padding, padding, padding);
+            budgetCategoryContainer.addView(emptyView);
+            return;
         }
 
-        for (BudgetCategory category : DEFAULT_CATEGORIES) {
+        List<Map.Entry<String, Long>> sortedEntries = new ArrayList<>(categoryTotals.entrySet());
+        sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+        for (Map.Entry<String, Long> entry : sortedEntries) {
+            long spent = entry.getValue();
+            if (spent <= 0) {
+                continue;
+            }
+
             View itemView = inflater.inflate(R.layout.item_budget_category, budgetCategoryContainer, false);
             TextView nameView = itemView.findViewById(R.id.tvCategoryName);
-            TextView budgetView = itemView.findViewById(R.id.tvCategoryBudget);
+            TextView amountView = itemView.findViewById(R.id.tvCategoryAmount);
             TextView percentView = itemView.findViewById(R.id.tvCategoryPercent);
             TextView spentView = itemView.findViewById(R.id.tvCategorySpent);
-            TextView remainingView = itemView.findViewById(R.id.tvCategoryRemaining);
             ProgressBar progressBar = itemView.findViewById(R.id.progressCategory);
 
-            long budgetAmount = incomeTotal > 0
-                    ? Math.round((category.defaultBudget / (float) defaultSum) * incomeTotal)
-                    : category.defaultBudget;
+            int percent = expenseTotal > 0 ? Math.min(100, Math.round((spent * 100f) / expenseTotal)) : 0;
 
-            long spent = categoryTotals.getOrDefault(category.getKey(), 0L);
-            long remaining = Math.max(0, budgetAmount - spent);
-            int percent = budgetAmount > 0 ? Math.min(100, Math.round((spent * 100f) / budgetAmount)) : 0;
-
-            nameView.setText(category.label);
-            budgetView.setText(TransactionStore.formatCurrency(budgetAmount));
+            nameView.setText(entry.getKey());
+            amountView.setText("Tỷ trọng chi");
             percentView.setText(percent + "%");
-            spentView.setText(TransactionStore.formatCurrency(spent));
-            remainingView.setText(TransactionStore.formatCurrency(remaining));
+            spentView.setText("Đã chi: " + TransactionStore.formatCurrency(spent));
             progressBar.setProgress(percent);
 
             budgetCategoryContainer.addView(itemView);
         }
     }
 
-    private static class BudgetCategory {
-        private final String label;
-        private final long defaultBudget;
-
-        BudgetCategory(String label, long defaultBudget) {
-            this.label = label;
-            this.defaultBudget = defaultBudget;
-        }
-
-        String getKey() {
-            return TransactionStore.normalizeCategory(label);
-        }
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 }

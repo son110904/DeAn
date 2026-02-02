@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class TransactionStore {
@@ -30,6 +32,21 @@ public class TransactionStore {
 
     public static long getCategoryTotal(Context context, String categoryKey) {
         return getPrefs(context).getLong(KEY_CATEGORY_PREFIX + categoryKey, 0L);
+    }
+
+    public static Map<String, Long> getCategoryTotals(Context context) {
+        SharedPreferences prefs = getPrefs(context);
+        Map<String, ?> allEntries = prefs.getAll();
+        Map<String, Long> categoryTotals = new HashMap<>();
+
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith(KEY_CATEGORY_PREFIX) && entry.getValue() instanceof Long) {
+                String categoryKey = key.substring(KEY_CATEGORY_PREFIX.length());
+                categoryTotals.put(categoryKey, (Long) entry.getValue());
+            }
+        }
+        return categoryTotals;
     }
 
     public static void syncFromTransactions(Context context, List<TransactionResponse> transactions) {
