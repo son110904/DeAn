@@ -1,30 +1,153 @@
 <resources>
     <string name="app_name">Quản lý chi tiêu</string>
-    <string name="title_main">Tổng quan tài chính</string>
-    <string name="total_income">Tổng thu: %1$dđ</string>
-    <string name="total_expense">Tổng chi: %1$dđ</string>
-    <string name="balance">Số dư: %1$dđ</string>
-    <string name="expense_chart_title">Biểu đồ chi tiêu</string>
-    <string name="title_add_transaction">Thêm giao dịch</string>
+
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_subtitle">Chào mừng bạn quay trở lại</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_hint">Nhập email</string>
+    <string name="login_password_label">Mật khẩu</string>
+    <string name="login_password_hint">Nhập mật khẩu</string>
+    <string name="login_button">Đăng nhập</string>
+    <string name="login_register_prompt">Chưa có tài khoản? Đăng ký</string>
+    <string name="login_logo_desc">Logo ứng dụng</string>
+
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="register_subtitle">Tạo tài khoản để bắt đầu quản lý tài chính</string>
+    <string name="register_full_name_label">Họ và tên</string>
+    <string name="register_full_name_hint">Nhập họ tên</string>
+    <string name="register_password_label">Mật khẩu</string>
+    <string name="register_password_hint">Nhập mật khẩu</string>
+    <string name="register_password_note">Tối thiểu 8 ký tự</string>
+    <string name="register_confirm_label">Xác nhận mật khẩu</string>
+    <string name="register_confirm_hint">Nhập lại mật khẩu</string>
+    <string name="register_button">Đăng ký</string>
+    <string name="register_login_prompt">Đã có tài khoản? Đăng nhập</string>
+
+    <string name="main_title">Tổng quan</string>
+    <string name="main_balance_title">Tổng số dư</string>
+    <string name="main_income_month">Thu nhập tháng này</string>
+    <string name="main_expense_month">Chi tiêu tháng này</string>
+    <string name="main_balance_month">Số dư tháng này</string>
+    <string name="main_transactions_title">Giao dịch gần đây</string>
+    <string name="main_no_transactions">Chưa có giao dịch. Vui lòng thêm giao dịch mới.</string>
+    <string name="main_see_all">Xem tất cả</string>
+    <string name="main_collapse">Thu gọn</string>
+
+    <string name="add_transaction_title">Thêm giao dịch</string>
+    <string name="add_transaction_income_tab">Khoản thu</string>
+    <string name="add_transaction_expense_tab">Khoản chi</string>
+    <string name="add_transaction_amount_label">Số tiền</string>
     <string name="hint_amount">Nhập số tiền</string>
-    <string name="income">Thu</string>
-    <string name="expense">Chi</string>
-    <string name="save_transaction">Lưu giao dịch</string>
-    <string name="error_missing_info">Vui lòng nhập đầy đủ thông tin</string>
-    <string name="transaction_saved">Đã lưu: %1$s - %2$sđ</string>
-    <string name="title_statistics">Thống kê chi tiêu</string>
-    <string name="chart_category_title">Danh mục chi tiêu</string>
-    <string name="food">Ăn uống</string>
-    <string name="transport">Di chuyển</string>
-    <string name="other">Khác</string>
-    <string name="title_forecast">Dự đoán chi tiêu</string>
-    <string name="forecast_description">
-        Hệ thống sử dụng mô hình học máy để phân tích dữ liệu chi tiêu trong quá khứ,
-        từ đó dự đoán tổng chi tiêu cho tháng tiếp theo.
-    </string>
-    <string name="forecast_result">Chi tiêu dự đoán tháng tới: 6.200.000đ</string>
+    <string name="add_transaction_currency_label">đồng</string>
+    <string name="add_transaction_account_from">Từ tài khoản</string>
+    <string name="add_transaction_account_to">Thu về</string>
+    <string name="add_transaction_account_bank">Tài khoản ngân hàng</string>
+    <string name="add_transaction_account_credit">Thẻ tín dụng</string>
+    <string name="add_transaction_account_cash">Tiền mặt</string>
+    <string name="add_transaction_category_label">Từ danh mục</string>
+    <string name="add_transaction_date_label">Ngày giao dịch</string>
+    <string name="add_transaction_date_hint">VD: 15/05/2024</string>
+    <string name="add_transaction_note_label">Ghi chú</string>
+    <string name="add_transaction_note_hint">Nhập ghi chú</string>
+    <string name="add_transaction_confirm">Xác nhận</string>
+
+    <string name="forecast_title">Dự đoán</string>
+    <string name="forecast_description_text">Dự đoán được tổng hợp từ lịch sử giao dịch để bạn theo dõi xu hướng thu chi.</string>
+    <string name="forecast_next_month">Tháng tới</string>
+    <string name="forecast_empty">Chưa có dữ liệu</string>
+    <string name="forecast_trend_title">Xu hướng chi tiêu</string>
+    <string name="forecast_trend_note">Giá trị dự đoán hiển thị theo từng tháng.</string>
+
+    <string name="statistics_income_tab">Thu</string>
+    <string name="statistics_expense_tab">Chi</string>
+    <string name="statistics_diff_label">Chênh lệch (Tháng)</string>
+    <string name="statistics_select_month_year">Chọn tháng/năm</string>
+    <string name="statistics_chart_title">Biểu đồ thu/chi</string>
+    <string name="statistics_ratio_label">Tỷ lệ chi/thu (Tháng)</string>
+    <string name="statistics_no_category">Chưa có chi tiêu theo danh mục.</string>
+    <string name="statistics_weighted_label">Tỷ trọng chi</string>
+    <string name="statistics_spent_prefix">Đã chi: %1$s</string>
+    <string name="statistics_expense_tab_amount">Chi %1$s</string>
+    <string name="percent_format">%1$d%%</string>
+
+    <string name="transactions_title">Giao dịch</string>
+    <string name="transactions_empty">Chưa có giao dịch nào. Hãy thêm giao dịch mới để hiển thị ở đây.</string>
+    <string name="transactions_add_button">Thêm giao dịch</string>
+
+    <string name="profile_title">Hồ sơ</string>
+    <string name="profile_info_title">Thông tin cá nhân</string>
+    <string name="profile_default_name">Người dùng</string>
+    <string name="profile_default_email">user@email.com</string>
+    <string name="profile_settings_button">Cài đặt</string>
+    <string name="profile_logout_button">Đăng xuất</string>
+
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_language_title">Ngôn ngữ</string>
+    <string name="settings_language_button">Đổi ngôn ngữ</string>
+    <string name="settings_interface_title">Giao diện</string>
+    <string name="settings_dark_mode">Chế độ tối</string>
+    <string name="settings_data_title">Dữ liệu</string>
+    <string name="settings_clear_data_button">Xóa dữ liệu cục bộ</string>
+
+    <string name="splash_title">Quản lý chi tiêu</string>
+
     <string name="nav_home">Trang chủ</string>
     <string name="nav_add">Thêm</string>
     <string name="nav_stats">Thống kê</string>
     <string name="nav_forecast">Dự đoán</string>
+    <string name="nav_profile">Hồ sơ</string>
+
+    <string name="toast_login_missing">Vui lòng nhập email và mật khẩu</string>
+    <string name="toast_register_missing">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="toast_register_mismatch">Mật khẩu xác nhận không khớp</string>
+    <string name="toast_register_success">Đăng ký thành công</string>
+    <string name="toast_add_missing">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="toast_add_missing_category">Vui lòng chọn danh mục</string>
+    <string name="toast_add_success">Đã lưu giao dịch</string>
+    <string name="toast_add_failed">Không thể lưu giao dịch</string>
+    <string name="toast_connection_error">Lỗi kết nối: %1$s</string>
+    <string name="toast_transactions_failed">Không lấy được dữ liệu giao dịch</string>
+    <string name="toast_switching_language">Đang chuyển ngôn ngữ...</string>
+    <string name="toast_dark_mode_on">Bật chế độ tối</string>
+    <string name="toast_dark_mode_off">Bật chế độ sáng</string>
+    <string name="toast_clear_data">Đã xóa dữ liệu cục bộ</string>
+
+    <string name="transaction_income_label">Thu</string>
+    <string name="transaction_expense_label">Chi</string>
+    <string name="transaction_income_default">Thu nhập</string>
+    <string name="transaction_expense_default">Chi tiêu</string>
+    <string name="transaction_unknown_category">Khác</string>
+    <string name="transaction_summary">%1$s %2$s%3$s</string>
+    <string name="amount_prefix_income">+ %1$s</string>
+    <string name="amount_prefix_expense">- %1$s</string>
+    <string name="separator_dot"> • </string>
+
+    <string name="chart_no_data">Chưa có dữ liệu biểu đồ.</string>
+    <string name="placeholder_currency_zero">0đ</string>
+    <string name="placeholder_percent_zero">0%</string>
+    <string name="placeholder_zero">0</string>
+
+    <string name="transaction_category_placeholder">Chọn danh mục</string>
+    <string name="category_food">🍜 Ăn uống</string>
+    <string name="category_transport">🚗 Giao thông vận tải</string>
+    <string name="category_home">🏠 Nhà ở</string>
+    <string name="category_entertainment">🎮 Giải trí</string>
+    <string name="category_shopping">🛒 Mua sắm</string>
+    <string name="category_health">💊 Y tế</string>
+    <string name="category_education">📚 Giáo dục</string>
+    <string name="category_hobby">🖼️ Sở thích</string>
+    <string name="category_other">💰 Khác</string>
+
+    <string-array name="transaction_categories">
+        <item>@string/transaction_category_placeholder</item>
+        <item>@string/category_food</item>
+        <item>@string/category_transport</item>
+        <item>@string/category_home</item>
+        <item>@string/category_entertainment</item>
+        <item>@string/category_shopping</item>
+        <item>@string/category_health</item>
+        <item>@string/category_education</item>
+        <item>@string/category_hobby</item>
+        <item>@string/category_other</item>
+    </string-array>
 </resources>

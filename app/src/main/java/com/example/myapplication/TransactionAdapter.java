@@ -29,24 +29,31 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 || "chi".equalsIgnoreCase(item.getType());
         String category = item.getCategory() != null && !item.getCategory().isEmpty()
                 ? item.getCategory()
-                : "Khác";
+                : holder.itemView.getContext().getString(R.string.transaction_unknown_category);
         String note = item.getNote();
         String dateLabel = formatDate(item.getCreatedAt());
 
         holder.title.setText(category);
-        String prefix = isExpense ? "- " : "+ ";
-        holder.amount.setText(prefix + TransactionStore.formatCurrency(item.getAmount()));
+        String amountValue = TransactionStore.formatCurrency(item.getAmount());
+        String amountLabel = isExpense
+                ? holder.itemView.getContext().getString(R.string.amount_prefix_expense, amountValue)
+                : holder.itemView.getContext().getString(R.string.amount_prefix_income, amountValue);
+        holder.amount.setText(amountLabel);
         int amountColor = isExpense
                 ? holder.itemView.getContext().getColor(R.color.accent_red)
                 : holder.itemView.getContext().getColor(R.color.accent_green);
         holder.amount.setTextColor(amountColor);
 
-        StringBuilder subtitle = new StringBuilder(isExpense ? "Chi" : "Thu");
+        String label = isExpense
+                ? holder.itemView.getContext().getString(R.string.transaction_expense_label)
+                : holder.itemView.getContext().getString(R.string.transaction_income_label);
+        String separator = holder.itemView.getContext().getString(R.string.separator_dot);
+        StringBuilder subtitle = new StringBuilder(label);
         if (note != null && !note.isEmpty()) {
-            subtitle.append(" • ").append(note);
+            subtitle.append(separator).append(note);
         }
         if (!dateLabel.isEmpty()) {
-            subtitle.append(" • ").append(dateLabel);
+            subtitle.append(separator).append(dateLabel);
         }
         holder.subtitle.setText(subtitle.toString());
     }
