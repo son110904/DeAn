@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PREVIEW_LIMIT = 3;
 
     TextView tvIncome, tvExpense, tvBalance;
+    TextView tvGreetingName;
     BarChart barChart;
     TextView tvSeeAll;
     TextView tvNoTransactions;
@@ -45,10 +46,12 @@ public class MainActivity extends AppCompatActivity {
         tvIncome = findViewById(R.id.tvIncome);
         tvExpense = findViewById(R.id.tvExpense);
         tvBalance = findViewById(R.id.tvBalance);
+        tvGreetingName = findViewById(R.id.tvGreetingName);
         barChart = findViewById(R.id.barChart);
         tvSeeAll = findViewById(R.id.tvSeeAll);
         tvNoTransactions = findViewById(R.id.tvNoTransactions);
         transactionListContainer = findViewById(R.id.transactionListContainer);
+        tvGreetingName.setText(AuthStore.getName(this));
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_home);
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        tvGreetingName.setText(AuthStore.getName(this));
         updateDashboard();
     }
 

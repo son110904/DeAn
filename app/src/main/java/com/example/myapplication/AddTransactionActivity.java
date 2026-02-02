@@ -39,6 +39,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     EditText edtDate;
 
     boolean isExpense = true;
+    private String defaultCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         rbCash = findViewById(R.id.rbCash);
         edtNote = findViewById(R.id.edtNote);
         edtDate = findViewById(R.id.edtDate);
+        defaultCategory = getString(R.string.category_default);
 
         // Thiết lập spinner categories
         setupCategorySpinner();

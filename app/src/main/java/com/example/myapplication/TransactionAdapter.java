@@ -25,6 +25,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         TransactionResponse item = items.get(position);
+        android.content.Context context = holder.itemView.getContext();
         boolean isExpense = "expense".equalsIgnoreCase(item.getType())
                 || "chi".equalsIgnoreCase(item.getType());
         String category = item.getCategory() != null && !item.getCategory().isEmpty()
@@ -40,8 +41,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 : holder.itemView.getContext().getString(R.string.amount_prefix_income, amountValue);
         holder.amount.setText(amountLabel);
         int amountColor = isExpense
-                ? holder.itemView.getContext().getColor(R.color.accent_red)
-                : holder.itemView.getContext().getColor(R.color.accent_green);
+                ? context.getColor(R.color.accent_red)
+                : context.getColor(R.color.accent_green);
         holder.amount.setTextColor(amountColor);
 
         String label = isExpense

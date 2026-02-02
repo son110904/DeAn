@@ -145,7 +145,11 @@ public class TransactionStore {
         if (categoryLabel == null) {
             return context.getString(R.string.transaction_unknown_category);
         }
-        return categoryLabel.replaceAll("^[^\\p{L}\\p{N}]+", "").trim();
+        String normalized = categoryLabel.replaceAll("^[^\\p{L}\\p{N}]+", "").trim();
+        if (normalized.isEmpty()) {
+            return context.getString(R.string.transaction_other_label);
+        }
+        return normalized;
     }
 
     public static String formatCurrency(long amount) {
