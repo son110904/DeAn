@@ -28,9 +28,19 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tổng quan"
+                    android:text="@string/main_greeting_title"
                     android:textColor="@color/text_primary"
-                    android:textSize="28sp"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvGreetingName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/profile_default_name"
+                    android:textColor="@color/text_primary"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
 
                 <!-- Total Balance Card -->
@@ -38,15 +48,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_pill"
+                    android:background="@drawable/bg_summary_gradient"
                     android:orientation="vertical"
                     android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tổng số dư"
-                        android:textColor="@color/text_secondary"
+                        android:text="@string/main_balance_label"
+                        android:textColor="@color/white"
                         android:textSize="13sp" />
 
                     <TextView
@@ -54,8 +64,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="0đ"
-                        android:textColor="@color/text_primary"
+                        android:text="@string/currency_placeholder"
+                        android:textColor="@color/white"
                         android:textSize="36sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -83,7 +93,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Thu nhập tháng này"
+                        android:text="@string/main_income_label"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -92,7 +102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="0đ"
+                        android:text="@string/currency_placeholder"
                         android:textColor="@color/accent_green"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -112,7 +122,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chi tiêu tháng này"
+                        android:text="@string/main_expense_label"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -121,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="0đ"
+                        android:text="@string/currency_placeholder"
                         android:textColor="@color/accent_red"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -142,7 +152,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Số dư tháng này"
+                    android:text="@string/main_month_balance_label"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -167,7 +177,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Giao dịch"
+                    android:text="@string/main_transactions_title"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -177,7 +187,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Chưa có giao dịch. Vui lòng thêm giao dịch mới."
+                    android:text="@string/main_no_transactions"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
@@ -193,7 +203,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Xem tất cả"
+                    android:text="@string/main_see_all"
                     android:textColor="@color/primary_blue"
                     android:textSize="14sp"
                     android:textStyle="bold" />

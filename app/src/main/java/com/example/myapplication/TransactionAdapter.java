@@ -25,23 +25,28 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         TransactionResponse item = items.get(position);
+        android.content.Context context = holder.itemView.getContext();
         boolean isExpense = "expense".equalsIgnoreCase(item.getType())
                 || "chi".equalsIgnoreCase(item.getType());
         String category = item.getCategory() != null && !item.getCategory().isEmpty()
                 ? item.getCategory()
-                : "Khác";
+                : context.getString(R.string.transaction_other_label);
         String note = item.getNote();
         String dateLabel = formatDate(item.getCreatedAt());
 
         holder.title.setText(category);
-        String prefix = isExpense ? "- " : "+ ";
+        String prefix = isExpense
+                ? context.getString(R.string.transaction_prefix_expense)
+                : context.getString(R.string.transaction_prefix_income);
         holder.amount.setText(prefix + TransactionStore.formatCurrency(item.getAmount()));
         int amountColor = isExpense
-                ? holder.itemView.getContext().getColor(R.color.accent_red)
-                : holder.itemView.getContext().getColor(R.color.accent_green);
+                ? context.getColor(R.color.accent_red)
+                : context.getColor(R.color.accent_green);
         holder.amount.setTextColor(amountColor);
 
-        StringBuilder subtitle = new StringBuilder(isExpense ? "Chi" : "Thu");
+        StringBuilder subtitle = new StringBuilder(isExpense
+                ? context.getString(R.string.transaction_label_expense)
+                : context.getString(R.string.transaction_label_income));
         if (note != null && !note.isEmpty()) {
             subtitle.append(" • ").append(note);
         }

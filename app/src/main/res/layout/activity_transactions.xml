@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Giao dịch"
+        android:text="@string/transactions_title"
         android:textColor="@color/text_primary"
         android:textSize="28sp"
         android:textStyle="bold" />
@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Chưa có giao dịch nào. Hãy thêm giao dịch mới để hiển thị ở đây."
+        android:text="@string/transactions_empty"
         android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
@@ -38,7 +38,7 @@
         android:layout_height="54dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="@color/primary_blue"
-        android:text="Thêm giao dịch"
+        android:text="@string/transactions_add_button"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="16sp"

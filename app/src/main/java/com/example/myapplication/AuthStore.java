@@ -29,11 +29,11 @@ public final class AuthStore {
     }
 
     public static String getName(Context context) {
-        return getPrefs(context).getString(KEY_NAME, "Người dùng");
+        return getPrefs(context).getString(KEY_NAME, context.getString(R.string.profile_default_name));
     }
 
     public static String getEmail(Context context) {
-        return getPrefs(context).getString(KEY_EMAIL, "user@email.com");
+        return getPrefs(context).getString(KEY_EMAIL, context.getString(R.string.profile_default_email));
     }
 
     public static void clear(Context context) {

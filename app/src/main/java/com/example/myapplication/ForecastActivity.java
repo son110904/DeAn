@@ -21,7 +21,7 @@ public class ForecastActivity extends AppCompatActivity {
         tvForecast = findViewById(R.id.tvForecast);
         bottomNav = findViewById(R.id.bottomNav);
 
-        tvForecast.setText("Chưa có dữ liệu");
+        tvForecast.setText(getString(R.string.forecast_no_data));
 
         // Đánh dấu tab hiện tại
         bottomNav.setSelectedItemId(R.id.menu_forecast);

@@ -18,18 +18,20 @@ public class SettingsActivity extends AppCompatActivity {
         Button btnClearData = findViewById(R.id.btnClearData);
 
         btnLanguage.setOnClickListener(v ->
-                Toast.makeText(this, "Đang chuyển ngôn ngữ...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.settings_language_toast), Toast.LENGTH_SHORT).show()
         );
 
         switchTheme.setOnCheckedChangeListener((buttonView, isChecked) ->
                 Toast.makeText(this,
-                        isChecked ? "Bật chế độ tối" : "Bật chế độ sáng",
+                        isChecked
+                                ? getString(R.string.settings_theme_dark_toast)
+                                : getString(R.string.settings_theme_light_toast),
                         Toast.LENGTH_SHORT).show()
         );
 
         btnClearData.setOnClickListener(v -> {
             TransactionStore.clearAll(this);
-            Toast.makeText(this, "Đã xóa dữ liệu cục bộ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.settings_clear_toast), Toast.LENGTH_SHORT).show();
         });
     }
 }

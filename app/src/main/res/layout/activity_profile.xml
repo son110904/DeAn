@@ -19,7 +19,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hồ sơ"
+                android:text="@string/profile_title"
                 android:textColor="@color/text_primary"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thông tin cá nhân"
+                    android:text="@string/profile_info_title"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -46,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Người dùng"
+                    android:text="@string/profile_default_name"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -56,7 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="user@email.com"
+                    android:text="@string/profile_default_email"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -67,7 +67,7 @@
                 android:layout_height="54dp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/card_background"
-                android:text="Cài đặt"
+                android:text="@string/profile_settings"
                 android:textAllCaps="false"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
@@ -79,7 +79,7 @@
                 android:layout_height="54dp"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="@color/accent_red"
-                android:text="Đăng xuất"
+                android:text="@string/profile_logout"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
