@@ -4,13 +4,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -33,7 +41,12 @@ public class StatisticsActivity extends AppCompatActivity {
     TextView tvBudgetTotal;
     ProgressBar progressBudgetTotal;
     LinearLayout budgetCategoryContainer;
+    Spinner spinnerMonthYear;
+    BarChart barChartMonthly;
     BottomNavigationView bottomNav;
+
+    private final List<TransactionResponse> allTransactions = new ArrayList<>();
+    private final List<String> monthKeys = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +61,15 @@ public class StatisticsActivity extends AppCompatActivity {
         tvBudgetTotal = findViewById(R.id.tvBudgetTotal);
         progressBudgetTotal = findViewById(R.id.progressBudgetTotal);
         budgetCategoryContainer = findViewById(R.id.budgetCategoryContainer);
+        spinnerMonthYear = findViewById(R.id.spinnerMonthYear);
+        barChartMonthly = findViewById(R.id.barChartMonthly);
         bottomNav = findViewById(R.id.bottomNav);
 
-        // Đánh dấu tab hiện tại
+        setupMonthlyChart();
         bottomNav.setSelectedItemId(R.id.menu_stats);
 
-        // Điều hướng
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-
             if (id == R.id.menu_home) {
                 startActivity(new Intent(this, MainActivity.class));
                 overridePendingTransition(0, 0);
@@ -76,7 +89,6 @@ public class StatisticsActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             }
-
             return false;
         });
     }
@@ -88,13 +100,15 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void fetchTransactions() {
-        ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
         apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
             @Override
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    TransactionStore.syncFromTransactions(StatisticsActivity.this, response.body());
-                    updateBudget(response.body());
+                    allTransactions.clear();
+                    allTransactions.addAll(response.body());
+                    setupMonthSpinner();
+                    fetchMonthlyStatistics();
                 } else {
                     updateBudgetFromStore();
                 }
@@ -107,22 +121,77 @@ public class StatisticsActivity extends AppCompatActivity {
         });
     }
 
-    private void updateBudget(List<TransactionResponse> transactions) {
+    private void fetchMonthlyStatistics() {
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+        apiService.getMonthlyStatistics().enqueue(new Callback<List<MonthlyStatisticResponse>>() {
+            @Override
+            public void onResponse(Call<List<MonthlyStatisticResponse>> call, Response<List<MonthlyStatisticResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    renderMonthlyChart(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MonthlyStatisticResponse>> call, Throwable t) {
+                barChartMonthly.clear();
+            }
+        });
+    }
+
+    private void setupMonthSpinner() {
+        monthKeys.clear();
+        for (TransactionResponse transaction : allTransactions) {
+            String key = extractMonthKey(transaction.getCreatedAt());
+            if (!key.isEmpty() && !monthKeys.contains(key)) {
+                monthKeys.add(key);
+            }
+        }
+        monthKeys.sort(Comparator.reverseOrder());
+
+        if (monthKeys.isEmpty()) {
+            monthKeys.add(getString(R.string.statistics_all_months));
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                monthKeys
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMonthYear.setAdapter(adapter);
+        spinnerMonthYear.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                updateBudgetByMonth(monthKeys.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+            }
+        });
+        updateBudgetByMonth(monthKeys.get(0));
+    }
+
+    private void updateBudgetByMonth(String monthKey) {
         long incomeTotal = 0L;
         long expenseTotal = 0L;
         Map<String, Long> categoryTotals = new HashMap<>();
-        for (TransactionResponse transaction : transactions) {
+
+        for (TransactionResponse transaction : allTransactions) {
+            String txMonth = extractMonthKey(transaction.getCreatedAt());
+            if (!monthKey.equals(getString(R.string.statistics_all_months)) && !monthKey.equals(txMonth)) {
+                continue;
+            }
             if ("income".equalsIgnoreCase(transaction.getType())) {
                 incomeTotal += transaction.getAmount();
             } else {
                 expenseTotal += transaction.getAmount();
                 String categoryKey = TransactionStore.normalizeCategory(this, transaction.getCategory());
-                long current = categoryTotals.getOrDefault(categoryKey, 0L);
-                categoryTotals.put(categoryKey, current + transaction.getAmount());
+                categoryTotals.put(categoryKey, categoryTotals.getOrDefault(categoryKey, 0L) + transaction.getAmount());
             }
         }
-        long remaining = incomeTotal - expenseTotal;
 
+        long remaining = incomeTotal - expenseTotal;
         applyBudgetSummary(incomeTotal, expenseTotal, categoryTotals, remaining);
     }
 
@@ -147,6 +216,57 @@ public class StatisticsActivity extends AppCompatActivity {
         progressBudgetTotal.setProgress(percent);
 
         renderCategories(expenseTotal, categoryTotals);
+    }
+
+    private void setupMonthlyChart() {
+        barChartMonthly.getDescription().setEnabled(false);
+        barChartMonthly.getLegend().setEnabled(true);
+        barChartMonthly.setNoDataText(getString(R.string.chart_no_data));
+        barChartMonthly.setFitBars(true);
+        XAxis xAxis = barChartMonthly.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setDrawGridLines(false);
+        barChartMonthly.getAxisRight().setEnabled(false);
+    }
+
+    private void renderMonthlyChart(List<MonthlyStatisticResponse> statistics) {
+        if (statistics.isEmpty()) {
+            barChartMonthly.clear();
+            return;
+        }
+
+        List<BarEntry> incomeEntries = new ArrayList<>();
+        List<BarEntry> expenseEntries = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+
+        for (int i = 0; i < statistics.size(); i++) {
+            MonthlyStatisticResponse stat = statistics.get(i);
+            incomeEntries.add(new BarEntry(i, stat.getIncome()));
+            expenseEntries.add(new BarEntry(i, stat.getExpense()));
+            labels.add(stat.getMonth());
+        }
+
+        BarDataSet incomeSet = new BarDataSet(incomeEntries, getString(R.string.statistics_income_tab));
+        incomeSet.setColor(ContextCompat.getColor(this, R.color.primary_blue));
+        BarDataSet expenseSet = new BarDataSet(expenseEntries, getString(R.string.statistics_expense_tab));
+        expenseSet.setColor(ContextCompat.getColor(this, R.color.accent_red));
+
+        BarData data = new BarData(incomeSet, expenseSet);
+        float groupSpace = 0.24f;
+        float barSpace = 0.02f;
+        float barWidth = 0.36f;
+        data.setBarWidth(barWidth);
+
+        XAxis xAxis = barChartMonthly.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+        xAxis.setLabelCount(labels.size());
+
+        barChartMonthly.setData(data);
+        barChartMonthly.getXAxis().setAxisMinimum(0f);
+        barChartMonthly.getXAxis().setAxisMaximum(0f + data.getGroupWidth(groupSpace, barSpace) * labels.size());
+        barChartMonthly.groupBars(0f, groupSpace, barSpace);
+        barChartMonthly.invalidate();
     }
 
     private void renderCategories(long expenseTotal, Map<String, Long> categoryTotals) {
@@ -189,6 +309,13 @@ public class StatisticsActivity extends AppCompatActivity {
 
             budgetCategoryContainer.addView(itemView);
         }
+    }
+
+    private String extractMonthKey(String createdAt) {
+        if (createdAt == null || createdAt.length() < 7) {
+            return "";
+        }
+        return createdAt.substring(0, 7);
     }
 
     private int dpToPx(int dp) {
