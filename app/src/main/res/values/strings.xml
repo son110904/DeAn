@@ -67,6 +67,7 @@
     <string name="statistics_no_category">Chưa có chi tiêu theo danh mục.</string>
     <string name="statistics_weighted_label">Tỷ trọng chi</string>
     <string name="statistics_spent_prefix">Đã chi: %1$s</string>
+    <string name="statistics_all_months">Tất cả tháng</string>
     <string name="statistics_expense_tab_amount">Chi %1$s</string>
     <string name="percent_format">%1$d%%</string>
 
@@ -101,6 +102,8 @@
     <string name="toast_register_missing">Vui lòng nhập đầy đủ thông tin</string>
     <string name="toast_register_mismatch">Mật khẩu xác nhận không khớp</string>
     <string name="toast_register_success">Đăng ký thành công</string>
+    <string name="toast_login_failed">Đăng nhập thất bại</string>
+    <string name="toast_register_failed">Đăng ký thất bại hoặc email đã tồn tại</string>
     <string name="toast_add_missing">Vui lòng nhập đầy đủ thông tin</string>
     <string name="toast_add_missing_category">Vui lòng chọn danh mục</string>
     <string name="toast_add_success">Đã lưu giao dịch</string>

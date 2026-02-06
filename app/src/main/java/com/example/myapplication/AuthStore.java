@@ -8,12 +8,13 @@ public final class AuthStore {
     private static final String KEY_LOGGED_IN = "logged_in";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_NAME = "name";
+    private static final String KEY_TOKEN = "token";
 
     private AuthStore() {
     }
 
     public static boolean isLoggedIn(Context context) {
-        return getPrefs(context).getBoolean(KEY_LOGGED_IN, false);
+        return getPrefs(context).getBoolean(KEY_LOGGED_IN, false) && !getToken(context).isEmpty();
     }
 
     public static void setLoggedIn(Context context, boolean loggedIn) {
@@ -26,6 +27,14 @@ public final class AuthStore {
                 .putString(KEY_NAME, name)
                 .putString(KEY_EMAIL, email)
                 .apply();
+    }
+
+    public static void saveToken(Context context, String token) {
+        getPrefs(context).edit().putString(KEY_TOKEN, token).apply();
+    }
+
+    public static String getToken(Context context) {
+        return getPrefs(context).getString(KEY_TOKEN, "");
     }
 
     public static String getName(Context context) {
