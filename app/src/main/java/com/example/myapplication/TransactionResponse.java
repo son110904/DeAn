@@ -34,4 +34,9 @@ public class TransactionResponse {
     public String getCreatedAt() {
         return createdAt;
     }
+
+    // Backward-compatible getter naming for environments still referencing snake_case accessors.
+    public String getCreated_at() {
+        return createdAt;
+    }
 }

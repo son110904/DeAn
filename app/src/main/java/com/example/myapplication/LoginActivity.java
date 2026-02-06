@@ -9,6 +9,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
     EditText edtLoginEmail;
@@ -35,10 +39,33 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            AuthStore.setLoggedIn(this, true);
-            AuthStore.saveProfile(this, AuthStore.getName(this), email);
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+            apiService.login(new AuthRequest(email, password)).enqueue(new Callback<AuthResponse>() {
+                @Override
+                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getUser() != null) {
+                        AuthResponse authResponse = response.body();
+                        AuthStore.saveToken(LoginActivity.this, authResponse.getToken());
+                        AuthStore.setLoggedIn(LoginActivity.this, true);
+                        AuthStore.saveProfile(
+                                LoginActivity.this,
+                                authResponse.getUser().getName(),
+                                authResponse.getUser().getEmail()
+                        );
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, getString(R.string.toast_login_failed), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AuthResponse> call, Throwable t) {
+                    Toast.makeText(LoginActivity.this,
+                            getString(R.string.toast_connection_error, t.getMessage()),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         tvGoRegister.setOnClickListener(v ->
