@@ -22,6 +22,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -127,13 +128,20 @@ public class StatisticsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<MonthlyStatisticResponse>> call, Response<List<MonthlyStatisticResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    renderMonthlyChart(response.body());
+                    List<MonthlyStatisticResponse> statistics = response.body();
+                    if (statistics.isEmpty() && !allTransactions.isEmpty()) {
+                        renderMonthlyChart(buildMonthlyStatisticsFromTransactions());
+                    } else {
+                        renderMonthlyChart(statistics);
+                    }
+                } else {
+                    renderMonthlyChart(buildMonthlyStatisticsFromTransactions());
                 }
             }
 
             @Override
             public void onFailure(Call<List<MonthlyStatisticResponse>> call, Throwable t) {
-                barChartMonthly.clear();
+                renderMonthlyChart(buildMonthlyStatisticsFromTransactions());
             }
         });
     }
@@ -267,6 +275,46 @@ public class StatisticsActivity extends AppCompatActivity {
         barChartMonthly.getXAxis().setAxisMaximum(0f + data.getGroupWidth(groupSpace, barSpace) * labels.size());
         barChartMonthly.groupBars(0f, groupSpace, barSpace);
         barChartMonthly.invalidate();
+    }
+
+    private List<MonthlyStatisticResponse> buildMonthlyStatisticsFromTransactions() {
+        if (allTransactions.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<String, MonthlyTotals> monthlyTotals = new HashMap<>();
+        for (TransactionResponse transaction : allTransactions) {
+            String monthKey = extractMonthKey(transaction.getCreatedAt());
+            if (monthKey.isEmpty()) {
+                continue;
+            }
+
+            MonthlyTotals totals = monthlyTotals.get(monthKey);
+            if (totals == null) {
+                totals = new MonthlyTotals();
+                monthlyTotals.put(monthKey, totals);
+            }
+
+            if ("income".equalsIgnoreCase(transaction.getType())) {
+                totals.income += transaction.getAmount();
+            } else {
+                totals.expense += transaction.getAmount();
+            }
+        }
+
+        List<String> months = new ArrayList<>(monthlyTotals.keySet());
+        Collections.sort(months);
+        List<MonthlyStatisticResponse> fallbackStatistics = new ArrayList<>();
+        for (String month : months) {
+            MonthlyTotals totals = monthlyTotals.get(month);
+            fallbackStatistics.add(new MonthlyStatisticResponse(month, totals.income, totals.expense));
+        }
+        return fallbackStatistics;
+    }
+
+    private static class MonthlyTotals {
+        int income;
+        int expense;
     }
 
     private void renderCategories(long expenseTotal, Map<String, Long> categoryTotals) {
