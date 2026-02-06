@@ -5,6 +5,15 @@ public class MonthlyStatisticResponse {
     private int income;
     private int expense;
 
+    public MonthlyStatisticResponse() {
+    }
+
+    public MonthlyStatisticResponse(String month, int income, int expense) {
+        this.month = month;
+        this.income = income;
+        this.expense = expense;
+    }
+
     public String getMonth() {
         return month;
     }
