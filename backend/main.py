@@ -15,10 +15,19 @@ def get_current_user(
     authorization: str = Header(default=""),
     db: Session = Depends(get_db),
 ):
-    if not authorization.startswith("Bearer "):
+    auth_value = (authorization or "").strip()
+    if not auth_value:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
-    token = authorization.replace("Bearer ", "", 1).strip()
+    if auth_value.lower().startswith("bearer "):
+        token = auth_value.split(" ", 1)[1].strip()
+    else:
+        # Backward compatibility: accept raw token format as well.
+        token = auth_value
+
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
     user = crud.get_user_by_token(db, token)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
