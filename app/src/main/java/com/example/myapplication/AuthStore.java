@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Locale;
+
 public final class AuthStore {
     private static final String PREFS_NAME = "auth_store";
     private static final String KEY_LOGGED_IN = "logged_in";
@@ -30,11 +32,12 @@ public final class AuthStore {
     }
 
     public static void saveToken(Context context, String token) {
-        getPrefs(context).edit().putString(KEY_TOKEN, token).apply();
+        getPrefs(context).edit().putString(KEY_TOKEN, sanitizeToken(token)).apply();
     }
 
     public static String getToken(Context context) {
-        return getPrefs(context).getString(KEY_TOKEN, "");
+        String token = getPrefs(context).getString(KEY_TOKEN, "");
+        return sanitizeToken(token);
     }
 
     public static String getName(Context context) {
@@ -51,5 +54,25 @@ public final class AuthStore {
 
     private static SharedPreferences getPrefs(Context context) {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    }
+
+    private static String sanitizeToken(String token) {
+        if (token == null) {
+            return "";
+        }
+
+        String normalized = token.trim();
+
+        if ((normalized.startsWith("\"") && normalized.endsWith("\""))
+                || (normalized.startsWith("'") && normalized.endsWith("'"))) {
+            normalized = normalized.substring(1, normalized.length() - 1).trim();
+        }
+
+        String lower = normalized.toLowerCase(Locale.US);
+        if (lower.startsWith("bearer ")) {
+            normalized = normalized.substring(7).trim();
+        }
+
+        return normalized;
     }
 }

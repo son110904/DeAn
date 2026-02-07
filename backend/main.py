@@ -1,3 +1,5 @@
+import re
+
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -15,10 +17,23 @@ def get_current_user(
     authorization: str = Header(default=""),
     db: Session = Depends(get_db),
 ):
-    if not authorization.startswith("Bearer "):
+    auth_value = (authorization or "").strip()
+    if not auth_value:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
-    token = authorization.replace("Bearer ", "", 1).strip()
+    # Accept case-insensitive bearer prefix and tolerate duplicate prefix from legacy clients.
+    token = auth_value
+    for _ in range(2):
+        if token.lower().startswith("bearer"):
+            token = re.sub(r"^bearer\s+", "", token, flags=re.IGNORECASE).strip()
+
+    if ((token.startswith('"') and token.endswith('"'))
+            or (token.startswith("'") and token.endswith("'"))):
+        token = token[1:-1].strip()
+
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
     user = crud.get_user_by_token(db, token)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
