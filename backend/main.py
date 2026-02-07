@@ -3,8 +3,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
-from .database import Base, engine, get_db
+from .database import Base, engine, get_db, migrate_legacy_schema
 
+migrate_legacy_schema()
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Finance API")
