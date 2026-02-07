@@ -21,7 +21,7 @@ public class RetrofitClient {
             Interceptor authInterceptor = chain -> {
                 Request original = chain.request();
                 String token = AuthStore.getToken(appContext);
-                if (token == null || token.isEmpty()) {
+                if (token.isEmpty()) {
                     return chain.proceed(original);
                 }
 
