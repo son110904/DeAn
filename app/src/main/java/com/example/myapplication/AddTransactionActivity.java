@@ -153,6 +153,16 @@ public class AddTransactionActivity extends AppCompatActivity {
                         edtDate.setText("");
                         selectTransactionType(isExpense);
                     } else {
+                        if (response.code() == 401) {
+                            AuthStore.clear(AddTransactionActivity.this);
+                            Toast.makeText(AddTransactionActivity.this,
+                                    getString(R.string.toast_login_failed),
+                                    Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(AddTransactionActivity.this, LoginActivity.class));
+                            finish();
+                            return;
+                        }
+
                         Toast.makeText(AddTransactionActivity.this,
                                 getString(R.string.toast_add_failed),
                                 Toast.LENGTH_SHORT).show();

@@ -44,6 +44,16 @@ public class TransactionsActivity extends AppCompatActivity {
                     adapter.submitList(transactions);
                     emptyState.setVisibility(transactions.isEmpty() ? View.VISIBLE : View.GONE);
                 } else {
+                    if (response.code() == 401) {
+                        AuthStore.clear(TransactionsActivity.this);
+                        Toast.makeText(TransactionsActivity.this,
+                                getString(R.string.toast_login_failed),
+                                Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(TransactionsActivity.this, LoginActivity.class));
+                        finish();
+                        return;
+                    }
+
                     Toast.makeText(TransactionsActivity.this,
                             getString(R.string.toast_transactions_failed),
                             Toast.LENGTH_SHORT).show();
