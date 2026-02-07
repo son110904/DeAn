@@ -23,6 +23,7 @@
     <string name="register_button">Đăng ký</string>
     <string name="register_login_prompt">Đã có tài khoản? Đăng nhập</string>
 
+    <string name="category_default">Mặc định</string>
     <string name="main_title">Tổng quan</string>
     <string name="main_balance_title">Tổng số dư</string>
     <string name="main_income_month">Thu nhập tháng này</string>
@@ -114,6 +115,8 @@
     <string name="toast_dark_mode_on">Bật chế độ tối</string>
     <string name="toast_dark_mode_off">Bật chế độ sáng</string>
     <string name="toast_clear_data">Đã xóa dữ liệu cục bộ</string>
+    <string name="transaction_other_label">Khác</string>
+
 
     <string name="transaction_income_label">Thu</string>
     <string name="transaction_expense_label">Chi</string>

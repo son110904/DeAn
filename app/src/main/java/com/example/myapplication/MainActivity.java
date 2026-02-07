@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             boolean isIncome = "income".equalsIgnoreCase(type);
             String category = transaction.getCategory() != null ? transaction.getCategory() : "";
             String note = transaction.getNote() != null ? transaction.getNote() : "";
-            String dateLabel = formatDate(transaction.getCreatedAt());
+            String dateLabel = formatDate(transaction.getDate());
 
             String fallbackTitle = isIncome
                     ? getString(R.string.transaction_income_default)

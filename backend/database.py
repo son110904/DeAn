@@ -1,21 +1,7 @@
-import os
-from pathlib import Path
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-
-def _build_database_url() -> str:
-    configured_url = os.getenv("FINANCE_DB_URL")
-    if configured_url:
-        return configured_url
-
-    repo_root = Path(__file__).resolve().parent.parent
-    db_path = repo_root / "finance.db"
-    return f"sqlite:///{db_path.as_posix()}"
-
-
-SQLALCHEMY_DATABASE_URL = _build_database_url()
+SQLALCHEMY_DATABASE_URL = "sqlite:///./finance.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

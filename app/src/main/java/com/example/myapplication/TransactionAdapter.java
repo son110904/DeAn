@@ -32,7 +32,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 ? item.getCategory()
                 : holder.itemView.getContext().getString(R.string.transaction_unknown_category);
         String note = item.getNote();
-        String dateLabel = formatDate(item.getCreatedAt());
+        String dateLabel = formatDate(item.getDate());
 
         holder.title.setText(category);
         String amountValue = TransactionStore.formatCurrency(item.getAmount());

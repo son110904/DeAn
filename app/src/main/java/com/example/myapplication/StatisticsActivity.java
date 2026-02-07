@@ -149,7 +149,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private void setupMonthSpinner() {
         monthKeys.clear();
         for (TransactionResponse transaction : allTransactions) {
-            String key = extractMonthKey(transaction.getCreatedAt());
+            String key = extractMonthKey(transaction.getDate());
             if (!key.isEmpty() && !monthKeys.contains(key)) {
                 monthKeys.add(key);
             }
@@ -186,7 +186,7 @@ public class StatisticsActivity extends AppCompatActivity {
         Map<String, Long> categoryTotals = new HashMap<>();
 
         for (TransactionResponse transaction : allTransactions) {
-            String txMonth = extractMonthKey(transaction.getCreatedAt());
+            String txMonth = extractMonthKey(transaction.getDate());
             if (!monthKey.equals(getString(R.string.statistics_all_months)) && !monthKey.equals(txMonth)) {
                 continue;
             }
@@ -284,7 +284,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         Map<String, MonthlyTotals> monthlyTotals = new HashMap<>();
         for (TransactionResponse transaction : allTransactions) {
-            String monthKey = extractMonthKey(transaction.getCreatedAt());
+            String monthKey = extractMonthKey(transaction.getDate());
             if (monthKey.isEmpty()) {
                 continue;
             }

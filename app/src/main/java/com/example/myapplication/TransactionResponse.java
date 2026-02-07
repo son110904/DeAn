@@ -8,8 +8,8 @@ public class TransactionResponse {
     private String category;
     private String type;
     private String note;
-    @SerializedName("created_at")
-    private String createdAt;
+    @SerializedName("date")
+    private String date;
 
     public int getId() {
         return id;
@@ -31,12 +31,7 @@ public class TransactionResponse {
         return note;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    // Backward-compatible getter naming for environments still referencing snake_case accessors.
-    public String getCreated_at() {
-        return createdAt;
+    public String getDate() {
+        return date;
     }
 }

@@ -128,7 +128,8 @@ public class AddTransactionActivity extends AppCompatActivity {
                     (int) amount,
                     requestCategory,
                     type,
-                    notePayload
+                    notePayload,
+                    date
             );
 
             ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
