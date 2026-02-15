@@ -22,4 +22,7 @@ public interface ApiService {
 
     @GET("statistics/monthly")
     Call<List<MonthlyStatisticResponse>> getMonthlyStatistics();
+
+    @POST("forecast")
+    Call<ForecastResponse> getForecast(@Body ForecastRequest request);
 }
