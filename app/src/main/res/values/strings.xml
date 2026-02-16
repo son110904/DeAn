@@ -140,6 +140,7 @@
     <string name="placeholder_currency_zero">0đ</string>
     <string name="placeholder_percent_zero">0%</string>
     <string name="placeholder_zero">0</string>
+    <string name="category_default">Chọn danh mục</string>
 
     <string name="transaction_category_placeholder">Chọn danh mục</string>
     <string name="category_food">🍜 Ăn uống</string>
@@ -151,6 +152,7 @@
     <string name="category_education">📚 Giáo dục</string>
     <string name="category_hobby">🖼️ Sở thích</string>
     <string name="category_other">💰 Khác</string>
+    <string name="transaction_other_label">Khác</string>
 
     <string-array name="transaction_categories">
         <item>@string/transaction_category_placeholder</item>
