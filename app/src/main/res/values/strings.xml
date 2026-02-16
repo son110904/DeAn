@@ -58,6 +58,14 @@
     <string name="forecast_empty">Chưa có dữ liệu</string>
     <string name="forecast_trend_title">Xu hướng chi tiêu</string>
     <string name="forecast_trend_note">Giá trị dự đoán hiển thị theo từng tháng.</string>
+    <string name="forecast_trend_up">Xu hướng: Tăng</string>
+    <string name="forecast_trend_down">Xu hướng: Giảm</string>
+    <string name="forecast_trend_stable">Xu hướng: Ổn định</string>
+    <string name="forecast_advice_high">Bạn đang chi quá nhiều (trên 2.000.000đ).</string>
+    <string name="forecast_advice_enough">Chi tiêu vừa đủ (từ 1.000.000đ đến 2.000.000đ).</string>
+    <string name="forecast_advice_low">Chi tiêu ít (dưới 1.000.000đ).</string>
+    <string name="forecast_advice_empty">Chưa đủ dữ liệu để đưa ra nhận định.</string>
+    <string name="forecast_month_label">T+%1$d</string>
 
     <string name="statistics_income_tab">Thu</string>
     <string name="statistics_expense_tab">Chi</string>
@@ -90,6 +98,10 @@
     <string name="settings_dark_mode">Chế độ tối</string>
     <string name="settings_data_title">Dữ liệu</string>
     <string name="settings_clear_data_button">Xóa dữ liệu cục bộ</string>
+    <string name="settings_server_title">Máy chủ backend</string>
+    <string name="settings_server_hint">VD: http://192.168.1.10:8000</string>
+    <string name="settings_server_save">Lưu địa chỉ máy chủ</string>
+    <string name="settings_server_note">Máy ảo Android: 10.0.2.2. Thiết bị thật: dùng IP LAN của máy chạy backend.</string>
 
     <string name="splash_title">Quản lý chi tiêu</string>
 
@@ -115,6 +127,7 @@
     <string name="toast_dark_mode_on">Bật chế độ tối</string>
     <string name="toast_dark_mode_off">Bật chế độ sáng</string>
     <string name="toast_clear_data">Đã xóa dữ liệu cục bộ</string>
+    <string name="toast_server_saved">Đã lưu máy chủ: %1$s</string>
     <string name="transaction_other_label">Khác</string>
 
 
@@ -132,6 +145,7 @@
     <string name="placeholder_currency_zero">0đ</string>
     <string name="placeholder_percent_zero">0%</string>
     <string name="placeholder_zero">0</string>
+    <string name="category_default">Chọn danh mục</string>
 
     <string name="transaction_category_placeholder">Chọn danh mục</string>
     <string name="category_food">🍜 Ăn uống</string>
@@ -143,6 +157,7 @@
     <string name="category_education">📚 Giáo dục</string>
     <string name="category_hobby">🖼️ Sở thích</string>
     <string name="category_other">💰 Khác</string>
+    <string name="transaction_other_label">Khác</string>
 
     <string-array name="transaction_categories">
         <item>@string/transaction_category_placeholder</item>

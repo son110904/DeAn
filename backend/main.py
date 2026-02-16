@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
+from .ml import forecast_expenses_sarima
 from .database import Base, engine, get_db, migrate_legacy_schema
 
 migrate_legacy_schema()
@@ -85,3 +86,17 @@ def get_monthly_statistics(
     current_user: models.User = Depends(get_current_user),
 ):
     return crud.get_monthly_statistics(db, user_id=current_user.id)
+
+
+@app.post("/forecast", response_model=schemas.ForecastResponse)
+def get_forecast(
+    payload: schemas.ForecastRequest,
+    current_user: models.User = Depends(get_current_user),
+):
+    _ = current_user
+    result = forecast_expenses_sarima(payload.history, steps=payload.steps)
+    return schemas.ForecastResponse(
+        predicted_value=result.predicted_value,
+        trend=result.trend,
+        forecast_series=result.forecast_series,
+    )

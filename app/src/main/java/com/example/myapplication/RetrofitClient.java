@@ -9,15 +9,17 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    private static final String BASE_URL = "http://10.0.2.2:8000/";
     private static Retrofit retrofit;
+    private static String activeBaseUrl = "";
 
     private RetrofitClient() {
     }
 
-    public static Retrofit getInstance(Context context) {
-        if (retrofit == null) {
-            Context appContext = context.getApplicationContext();
+    public static synchronized Retrofit getInstance(Context context) {
+        Context appContext = context.getApplicationContext();
+        String baseUrl = ApiConfigStore.getBaseUrl(appContext);
+
+        if (retrofit == null || !baseUrl.equals(activeBaseUrl)) {
             Interceptor authInterceptor = chain -> {
                 Request original = chain.request();
                 String token = AuthStore.getToken(appContext);
@@ -36,11 +38,14 @@ public class RetrofitClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(baseUrl)
                     .client(httpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
+
+            activeBaseUrl = baseUrl;
         }
+
         return retrofit;
     }
 }
