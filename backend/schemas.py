@@ -52,3 +52,14 @@ class MonthlyStatistic(BaseModel):
     month: str
     income: int
     expense: int
+
+
+class ForecastRequest(BaseModel):
+    history: list[int]
+    steps: int = 3
+
+
+class ForecastResponse(BaseModel):
+    predicted_value: float
+    trend: str
+    forecast_series: list[float]
