@@ -98,6 +98,10 @@
     <string name="settings_dark_mode">Chế độ tối</string>
     <string name="settings_data_title">Dữ liệu</string>
     <string name="settings_clear_data_button">Xóa dữ liệu cục bộ</string>
+    <string name="settings_server_title">Máy chủ backend</string>
+    <string name="settings_server_hint">VD: http://192.168.1.10:8000</string>
+    <string name="settings_server_save">Lưu địa chỉ máy chủ</string>
+    <string name="settings_server_note">Máy ảo Android: 10.0.2.2. Thiết bị thật: dùng IP LAN của máy chạy backend.</string>
 
     <string name="splash_title">Quản lý chi tiêu</string>
 
@@ -123,6 +127,7 @@
     <string name="toast_dark_mode_on">Bật chế độ tối</string>
     <string name="toast_dark_mode_off">Bật chế độ sáng</string>
     <string name="toast_clear_data">Đã xóa dữ liệu cục bộ</string>
+    <string name="toast_server_saved">Đã lưu máy chủ: %1$s</string>
     <string name="transaction_other_label">Khác</string>
 
 
