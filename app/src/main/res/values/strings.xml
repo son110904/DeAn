@@ -128,7 +128,6 @@
     <string name="toast_dark_mode_off">Bật chế độ sáng</string>
     <string name="toast_clear_data">Đã xóa dữ liệu cục bộ</string>
     <string name="toast_server_saved">Đã lưu máy chủ: %1$s</string>
-    <string name="transaction_other_label">Khác</string>
 
 
     <string name="transaction_income_label">Thu</string>
@@ -145,8 +144,6 @@
     <string name="placeholder_currency_zero">0đ</string>
     <string name="placeholder_percent_zero">0%</string>
     <string name="placeholder_zero">0</string>
-    <string name="category_default">Chọn danh mục</string>
-
     <string name="transaction_category_placeholder">Chọn danh mục</string>
     <string name="category_food">🍜 Ăn uống</string>
     <string name="category_transport">🚗 Giao thông vận tải</string>
