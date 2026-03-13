@@ -36,9 +36,6 @@
             android:name=".StatisticsActivity"
             android:exported="false" />
         <activity
-            android:name=".ForecastActivity"
-            android:exported="false" />
-        <activity
             android:name=".TransactionsActivity"
             android:exported="false" />
         <activity

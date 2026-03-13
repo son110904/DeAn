@@ -86,10 +86,6 @@ public class AddTransactionActivity extends AppCompatActivity {
                 startActivity(new Intent(this, StatisticsActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
-            } else if (id == R.id.menu_forecast) {
-                startActivity(new Intent(this, ForecastActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
             } else if (id == R.id.menu_profile) {
                 startActivity(new Intent(this, ProfileActivity.class));
                 overridePendingTransition(0, 0);

@@ -52,20 +52,6 @@
     <string name="add_transaction_note_hint">Nhập ghi chú</string>
     <string name="add_transaction_confirm">Xác nhận</string>
 
-    <string name="forecast_title">Dự đoán</string>
-    <string name="forecast_description_text">Dự đoán được tổng hợp từ lịch sử giao dịch để bạn theo dõi xu hướng thu chi.</string>
-    <string name="forecast_next_month">Tháng tới</string>
-    <string name="forecast_empty">Chưa có dữ liệu</string>
-    <string name="forecast_trend_title">Xu hướng chi tiêu</string>
-    <string name="forecast_trend_note">Giá trị dự đoán hiển thị theo từng tháng.</string>
-    <string name="forecast_trend_up">Xu hướng: Tăng</string>
-    <string name="forecast_trend_down">Xu hướng: Giảm</string>
-    <string name="forecast_trend_stable">Xu hướng: Ổn định</string>
-    <string name="forecast_advice_high">Bạn đang chi quá nhiều (trên 2.000.000đ).</string>
-    <string name="forecast_advice_enough">Chi tiêu vừa đủ (từ 1.000.000đ đến 2.000.000đ).</string>
-    <string name="forecast_advice_low">Chi tiêu ít (dưới 1.000.000đ).</string>
-    <string name="forecast_advice_empty">Chưa đủ dữ liệu để đưa ra nhận định.</string>
-    <string name="forecast_month_label">T+%1$d</string>
 
     <string name="statistics_income_tab">Thu</string>
     <string name="statistics_expense_tab">Chi</string>
@@ -108,7 +94,6 @@
     <string name="nav_home">Trang chủ</string>
     <string name="nav_add">Thêm</string>
     <string name="nav_stats">Thống kê</string>
-    <string name="nav_forecast">Dự đoán</string>
     <string name="nav_profile">Hồ sơ</string>
 
     <string name="toast_login_missing">Vui lòng nhập email và mật khẩu</string>
