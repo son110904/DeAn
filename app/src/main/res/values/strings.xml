@@ -140,6 +140,8 @@
     <string name="category_hobby">🖼️ Sở thích</string>
     <string name="category_other">💰 Khác</string>
     <string name="transaction_other_label">Khác</string>
+    <string name="statistics_expense_chart_center_text" />
+    <string name="statistics_expense_categories" />
 
     <string-array name="transaction_categories">
         <item>@string/transaction_category_placeholder</item>

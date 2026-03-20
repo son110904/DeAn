@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +15,17 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -42,8 +49,10 @@ public class StatisticsActivity extends AppCompatActivity {
     TextView tvBudgetTotal;
     ProgressBar progressBudgetTotal;
     LinearLayout budgetCategoryContainer;
+    LinearLayout topTransactionsContainer;
     Spinner spinnerMonthYear;
-    BarChart barChartMonthly;
+    PieChart pieChartCategory;
+    LineChart lineChartDaily;
     BottomNavigationView bottomNav;
 
     private final List<TransactionResponse> allTransactions = new ArrayList<>();
@@ -62,11 +71,14 @@ public class StatisticsActivity extends AppCompatActivity {
         tvBudgetTotal = findViewById(R.id.tvBudgetTotal);
         progressBudgetTotal = findViewById(R.id.progressBudgetTotal);
         budgetCategoryContainer = findViewById(R.id.budgetCategoryContainer);
+        topTransactionsContainer = findViewById(R.id.topTransactionsContainer);
         spinnerMonthYear = findViewById(R.id.spinnerMonthYear);
-        barChartMonthly = findViewById(R.id.barChartMonthly);
+        pieChartCategory = findViewById(R.id.pieChartCategory);
+        lineChartDaily = findViewById(R.id.lineChartDaily);
         bottomNav = findViewById(R.id.bottomNav);
 
-        setupMonthlyChart();
+        setupPieChart();
+        setupLineChart();
         bottomNav.setSelectedItemId(R.id.menu_stats);
 
         bottomNav.setOnItemSelectedListener(item -> {
@@ -105,7 +117,6 @@ public class StatisticsActivity extends AppCompatActivity {
                     allTransactions.clear();
                     allTransactions.addAll(response.body());
                     setupMonthSpinner();
-                    fetchMonthlyStatistics();
                 } else {
                     updateBudgetFromStore();
                 }
@@ -114,30 +125,6 @@ public class StatisticsActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<TransactionResponse>> call, Throwable t) {
                 updateBudgetFromStore();
-            }
-        });
-    }
-
-    private void fetchMonthlyStatistics() {
-        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
-        apiService.getMonthlyStatistics().enqueue(new Callback<List<MonthlyStatisticResponse>>() {
-            @Override
-            public void onResponse(Call<List<MonthlyStatisticResponse>> call, Response<List<MonthlyStatisticResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<MonthlyStatisticResponse> statistics = response.body();
-                    if (statistics.isEmpty() && !allTransactions.isEmpty()) {
-                        renderMonthlyChart(buildMonthlyStatisticsFromTransactions());
-                    } else {
-                        renderMonthlyChart(statistics);
-                    }
-                } else {
-                    renderMonthlyChart(buildMonthlyStatisticsFromTransactions());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<MonthlyStatisticResponse>> call, Throwable t) {
-                renderMonthlyChart(buildMonthlyStatisticsFromTransactions());
             }
         });
     }
@@ -167,6 +154,7 @@ public class StatisticsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 updateBudgetByMonth(monthKeys.get(position));
+                fetchDailySummary(monthKeys.get(position));
             }
 
             @Override
@@ -174,18 +162,21 @@ public class StatisticsActivity extends AppCompatActivity {
             }
         });
         updateBudgetByMonth(monthKeys.get(0));
+        fetchDailySummary(monthKeys.get(0));
     }
 
     private void updateBudgetByMonth(String monthKey) {
         long incomeTotal = 0L;
         long expenseTotal = 0L;
         Map<String, Long> categoryTotals = new HashMap<>();
+        List<TransactionResponse> filteredTransactions = new ArrayList<>();
 
         for (TransactionResponse transaction : allTransactions) {
             String txMonth = extractMonthKey(transaction.getDate());
             if (!monthKey.equals(getString(R.string.statistics_all_months)) && !monthKey.equals(txMonth)) {
                 continue;
             }
+            filteredTransactions.add(transaction);
             if ("income".equalsIgnoreCase(transaction.getType())) {
                 incomeTotal += transaction.getAmount();
             } else {
@@ -197,6 +188,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         long remaining = incomeTotal - expenseTotal;
         applyBudgetSummary(incomeTotal, expenseTotal, categoryTotals, remaining);
+        renderTopTransactions(filteredTransactions);
     }
 
     private void updateBudgetFromStore() {
@@ -220,97 +212,123 @@ public class StatisticsActivity extends AppCompatActivity {
         progressBudgetTotal.setProgress(percent);
 
         renderCategories(expenseTotal, categoryTotals);
+        renderPieChart(categoryTotals, expenseTotal);
     }
 
-    private void setupMonthlyChart() {
-        barChartMonthly.getDescription().setEnabled(false);
-        barChartMonthly.getLegend().setEnabled(true);
-        barChartMonthly.setNoDataText(getString(R.string.chart_no_data));
-        barChartMonthly.setFitBars(true);
-        XAxis xAxis = barChartMonthly.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f);
-        xAxis.setDrawGridLines(false);
-        barChartMonthly.getAxisRight().setEnabled(false);
+    private void setupPieChart() {
+        pieChartCategory.setUsePercentValues(true);
+        pieChartCategory.getDescription().setEnabled(false);
+        pieChartCategory.setExtraOffsets(5, 10, 5, 5);
+        pieChartCategory.setDragDecelerationFrictionCoef(0.95f);
+        pieChartCategory.setDrawHoleEnabled(true);
+        pieChartCategory.setHoleColor(Color.WHITE);
+        pieChartCategory.setTransparentCircleColor(Color.WHITE);
+        pieChartCategory.setTransparentCircleAlpha(110);
+        pieChartCategory.setHoleRadius(58f);
+        pieChartCategory.setTransparentCircleRadius(61f);
+        pieChartCategory.setDrawCenterText(true);
+        pieChartCategory.setRotationAngle(0);
+        pieChartCategory.setRotationEnabled(true);
+        pieChartCategory.setHighlightPerTapEnabled(true);
+        pieChartCategory.setCenterTextSize(10f);
+        pieChartCategory.getLegend().setEnabled(false);
     }
 
-    private void renderMonthlyChart(List<MonthlyStatisticResponse> statistics) {
-        if (statistics.isEmpty()) {
-            barChartMonthly.clear();
+    private void setupLineChart() {
+        lineChartDaily.getDescription().setEnabled(false);
+        lineChartDaily.setDrawGridBackground(false);
+        lineChartDaily.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChartDaily.getXAxis().setDrawGridLines(false);
+        lineChartDaily.getAxisRight().setEnabled(false);
+    }
+
+    @SuppressLint("StringFormatInvalid")
+    private void renderPieChart(Map<String, Long> categoryTotals, long expenseTotal) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        if (categoryTotals.isEmpty() || expenseTotal <= 0) {
+            pieChartCategory.clear();
+            pieChartCategory.setNoDataText(getString(R.string.chart_no_data));
+            pieChartCategory.invalidate();
             return;
         }
 
-        List<BarEntry> incomeEntries = new ArrayList<>();
-        List<BarEntry> expenseEntries = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
+        pieChartCategory.setCenterText(getString(R.string.statistics_expense_chart_center_text, TransactionStore.formatCurrency(expenseTotal)));
 
-        for (int i = 0; i < statistics.size(); i++) {
-            MonthlyStatisticResponse stat = statistics.get(i);
-            incomeEntries.add(new BarEntry(i, stat.getIncome()));
-            expenseEntries.add(new BarEntry(i, stat.getExpense()));
-            labels.add(stat.getMonth());
+        List<Map.Entry<String, Long>> sortedEntries = new ArrayList<>(categoryTotals.entrySet());
+        sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+        for (Map.Entry<String, Long> entry : sortedEntries) {
+            if (entry.getValue() > 0) {
+                entries.add(new PieEntry(entry.getValue(), entry.getKey()));
+            }
         }
 
-        BarDataSet incomeSet = new BarDataSet(incomeEntries, getString(R.string.statistics_income_tab));
-        incomeSet.setColor(ContextCompat.getColor(this, R.color.primary_blue));
-        BarDataSet expenseSet = new BarDataSet(expenseEntries, getString(R.string.statistics_expense_tab));
-        expenseSet.setColor(ContextCompat.getColor(this, R.color.accent_red));
+        PieDataSet dataSet = new PieDataSet(entries, getString(R.string.statistics_expense_categories));
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
 
-        BarData data = new BarData(incomeSet, expenseSet);
-        float groupSpace = 0.24f;
-        float barSpace = 0.02f;
-        float barWidth = 0.36f;
-        data.setBarWidth(barWidth);
+        ArrayList<Integer> colors = new ArrayList<>();
+        for (int c : ColorTemplate.VORDIPLOM_COLORS) colors.add(c);
+        for (int c : ColorTemplate.JOYFUL_COLORS) colors.add(c);
+        dataSet.setColors(colors);
 
-        XAxis xAxis = barChartMonthly.getXAxis();
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-        xAxis.setLabelCount(labels.size());
-
-        barChartMonthly.setData(data);
-        barChartMonthly.getXAxis().setAxisMinimum(0f);
-        barChartMonthly.getXAxis().setAxisMaximum(0f + data.getGroupWidth(groupSpace, barSpace) * labels.size());
-        barChartMonthly.groupBars(0f, groupSpace, barSpace);
-        barChartMonthly.invalidate();
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new PercentFormatter(pieChartCategory));
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.BLACK);
+        
+        pieChartCategory.setData(data);
+        pieChartCategory.invalidate();
     }
 
-    private List<MonthlyStatisticResponse> buildMonthlyStatisticsFromTransactions() {
-        if (allTransactions.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        Map<String, MonthlyTotals> monthlyTotals = new HashMap<>();
-        for (TransactionResponse transaction : allTransactions) {
-            String monthKey = extractMonthKey(transaction.getDate());
-            if (monthKey.isEmpty()) {
-                continue;
+    private void fetchDailySummary(String month) {
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+        apiService.getDailySummary(month).enqueue(new Callback<List<DailySpendingResponse>>() {
+            @Override
+            public void onResponse(Call<List<DailySpendingResponse>> call, Response<List<DailySpendingResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    renderLineChart(response.body());
+                }
             }
-
-            MonthlyTotals totals = monthlyTotals.get(monthKey);
-            if (totals == null) {
-                totals = new MonthlyTotals();
-                monthlyTotals.put(monthKey, totals);
-            }
-
-            if ("income".equalsIgnoreCase(transaction.getType())) {
-                totals.income += transaction.getAmount();
-            } else {
-                totals.expense += transaction.getAmount();
-            }
-        }
-
-        List<String> months = new ArrayList<>(monthlyTotals.keySet());
-        Collections.sort(months);
-        List<MonthlyStatisticResponse> fallbackStatistics = new ArrayList<>();
-        for (String month : months) {
-            MonthlyTotals totals = monthlyTotals.get(month);
-            fallbackStatistics.add(new MonthlyStatisticResponse(month, totals.income, totals.expense));
-        }
-        return fallbackStatistics;
+            @Override
+            public void onFailure(Call<List<DailySpendingResponse>> call, Throwable t) {}
+        });
     }
 
-    private static class MonthlyTotals {
-        int income;
-        int expense;
+    private void renderLineChart(List<DailySpendingResponse> dailyData) {
+        ArrayList<Entry> entries = new ArrayList<>();
+        for (int i = 0; i < dailyData.size(); i++) {
+            entries.add(new Entry(i + 1, dailyData.get(i).getAmount()));
+        }
+        LineDataSet dataSet = new LineDataSet(entries, "Chi tiêu theo ngày");
+        dataSet.setColor(ContextCompat.getColor(this, R.color.primary_blue));
+        dataSet.setLineWidth(2f);
+        dataSet.setCircleRadius(4f);
+        dataSet.setDrawValues(false);
+
+        LineData data = new LineData(dataSet);
+        lineChartDaily.setData(data);
+        lineChartDaily.invalidate();
+    }
+
+    private void renderTopTransactions(List<TransactionResponse> transactions) {
+        topTransactionsContainer.removeAllViews();
+        transactions.sort((t1, t2) -> Long.compare(t2.getAmount(), t1.getAmount()));
+        
+        LayoutInflater inflater = LayoutInflater.from(this);
+        int count = 0;
+        for (TransactionResponse t : transactions) {
+            if (count >= 5) break;
+            View view = inflater.inflate(R.layout.item_transaction, topTransactionsContainer, false);
+            TextView title = view.findViewById(R.id.tvTransactionTitle);
+            TextView amount = view.findViewById(R.id.tvTransactionAmount);
+            title.setText(t.getCategory());
+            amount.setText(TransactionStore.formatCurrency(t.getAmount()));
+            amount.setTextColor(ContextCompat.getColor(this, "expense".equals(t.getType()) ? R.color.accent_red : R.color.primary_blue));
+            topTransactionsContainer.addView(view);
+            count++;
+        }
     }
 
     private void renderCategories(long expenseTotal, Map<String, Long> categoryTotals) {
@@ -332,9 +350,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         for (Map.Entry<String, Long> entry : sortedEntries) {
             long spent = entry.getValue();
-            if (spent <= 0) {
-                continue;
-            }
+            if (spent <= 0) continue;
 
             View itemView = inflater.inflate(R.layout.item_budget_category, budgetCategoryContainer, false);
             TextView nameView = itemView.findViewById(R.id.tvCategoryName);
@@ -344,21 +360,17 @@ public class StatisticsActivity extends AppCompatActivity {
             ProgressBar progressBar = itemView.findViewById(R.id.progressCategory);
 
             int percent = expenseTotal > 0 ? Math.min(100, Math.round((spent * 100f) / expenseTotal)) : 0;
-
             nameView.setText(entry.getKey());
             amountView.setText(getString(R.string.statistics_weighted_label));
             percentView.setText(getString(R.string.percent_format, percent));
             spentView.setText(getString(R.string.statistics_spent_prefix, TransactionStore.formatCurrency(spent)));
             progressBar.setProgress(percent);
-
             budgetCategoryContainer.addView(itemView);
         }
     }
 
     private String extractMonthKey(String createdAt) {
-        if (createdAt == null || createdAt.length() < 7) {
-            return "";
-        }
+        if (createdAt == null || createdAt.length() < 7) return "";
         return createdAt.substring(0, 7);
     }
 
