@@ -19,14 +19,17 @@ import retrofit2.Response;
 
 public class TransactionsActivity extends AppCompatActivity {
 
+    private TransactionAdapter adapter;
+    private TextView emptyState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transactions);
 
-        TextView emptyState = findViewById(R.id.tvEmptyState);
+        emptyState = findViewById(R.id.tvEmptyState);
         RecyclerView recyclerView = findViewById(R.id.recyclerTransactions);
-        TransactionAdapter adapter = new TransactionAdapter();
+        adapter = new TransactionAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
@@ -35,6 +38,26 @@ public class TransactionsActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AddTransactionActivity.class))
         );
 
+        adapter.setOnTransactionClickListener(transaction -> {
+            Intent intent = new Intent(this, AddTransactionActivity.class);
+            intent.putExtra("isEdit", true);
+            intent.putExtra("transactionId", transaction.getId());
+            intent.putExtra("amount", (long) transaction.getAmount());
+            intent.putExtra("category", transaction.getCategory());
+            intent.putExtra("type", transaction.getType());
+            intent.putExtra("note", transaction.getNote());
+            intent.putExtra("date", transaction.getDate());
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadTransactions();
+    }
+
+    private void loadTransactions() {
         ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
         apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
             @Override
@@ -46,14 +69,10 @@ public class TransactionsActivity extends AppCompatActivity {
                 } else {
                     if (response.code() == 401) {
                         AuthStore.clear(TransactionsActivity.this);
-                        Toast.makeText(TransactionsActivity.this,
-                                getString(R.string.toast_login_failed),
-                                Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(TransactionsActivity.this, LoginActivity.class));
                         finish();
                         return;
                     }
-
                     Toast.makeText(TransactionsActivity.this,
                             getString(R.string.toast_transactions_failed),
                             Toast.LENGTH_SHORT).show();

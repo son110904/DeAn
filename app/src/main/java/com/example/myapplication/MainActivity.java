@@ -92,14 +92,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDashboard() {
-        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+        ApiService apiService = RetrofitClient.getInstance(getApplicationContext()).create(ApiService.class);
         apiService.getTransactions().enqueue(new Callback<List<TransactionResponse>>() {
             @Override
             public void onResponse(Call<List<TransactionResponse>> call, Response<List<TransactionResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     allTransactions.clear();
                     allTransactions.addAll(response.body());
-                    TransactionStore.syncFromTransactions(MainActivity.this, allTransactions);
+                    TransactionStore.syncFromTransactions(getApplicationContext(), allTransactions);
                     updateDashboardFromTransactions(allTransactions);
                 } else {
                     updateDashboardFromStore();

@@ -29,7 +29,6 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,6 @@ import retrofit2.Response;
 
 public class StatisticsActivity extends AppCompatActivity {
 
-    TextView tvBudgetExpenseTab;
     TextView tvBudgetRemaining;
     TextView tvBudgetPercent;
     TextView tvBudgetSpent;
@@ -63,7 +61,6 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
 
-        tvBudgetExpenseTab = findViewById(R.id.tvBudgetExpenseTab);
         tvBudgetRemaining = findViewById(R.id.tvBudgetRemaining);
         tvBudgetPercent = findViewById(R.id.tvBudgetPercent);
         tvBudgetSpent = findViewById(R.id.tvBudgetSpent);
@@ -200,8 +197,6 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void applyBudgetSummary(long incomeTotal, long expenseTotal, Map<String, Long> categoryTotals, long remaining) {
-        tvBudgetExpenseTab.setText(getString(R.string.statistics_expense_tab_amount,
-                TransactionStore.formatCurrency(expenseTotal)));
         tvBudgetRemaining.setText(TransactionStore.formatCurrency(remaining));
         tvBudgetTotal.setText(TransactionStore.formatCurrency(incomeTotal));
         tvBudgetSpent.setText(TransactionStore.formatCurrency(expenseTotal));
@@ -359,23 +354,28 @@ public class StatisticsActivity extends AppCompatActivity {
             TextView spentView = itemView.findViewById(R.id.tvCategorySpent);
             ProgressBar progressBar = itemView.findViewById(R.id.progressCategory);
 
-            int percent = expenseTotal > 0 ? Math.min(100, Math.round((spent * 100f) / expenseTotal)) : 0;
             nameView.setText(entry.getKey());
-            amountView.setText(getString(R.string.statistics_weighted_label));
+            amountView.setText(TransactionStore.formatCurrency(spent));
+            int percent = (int) ((spent * 100f) / expenseTotal);
             percentView.setText(getString(R.string.percent_format, percent));
             spentView.setText(getString(R.string.statistics_spent_prefix, TransactionStore.formatCurrency(spent)));
             progressBar.setProgress(percent);
+
             budgetCategoryContainer.addView(itemView);
         }
     }
 
-    private String extractMonthKey(String createdAt) {
-        if (createdAt == null || createdAt.length() < 7) return "";
-        return createdAt.substring(0, 7);
+    private String extractMonthKey(String date) {
+        if (date == null || !date.contains("-")) return "";
+        String[] parts = date.split("T")[0].split("-");
+        if (parts.length >= 2) {
+            return parts[0] + "-" + parts[1];
+        }
+        return "";
     }
 
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
+        return Math.round((float) dp * density);
     }
 }

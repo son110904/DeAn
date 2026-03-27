@@ -13,6 +13,15 @@ import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
     private final List<TransactionResponse> items = new ArrayList<>();
+    private OnTransactionClickListener listener;
+
+    public interface OnTransactionClickListener {
+        void onTransactionClick(TransactionResponse transaction);
+    }
+
+    public void setOnTransactionClickListener(OnTransactionClickListener listener) {
+        this.listener = listener;
+    }
 
     @NonNull
     @Override
@@ -26,29 +35,33 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         TransactionResponse item = items.get(position);
         android.content.Context context = holder.itemView.getContext();
+        
         boolean isExpense = "expense".equalsIgnoreCase(item.getType())
                 || "chi".equalsIgnoreCase(item.getType());
+                
         String category = item.getCategory() != null && !item.getCategory().isEmpty()
                 ? item.getCategory()
-                : holder.itemView.getContext().getString(R.string.transaction_unknown_category);
-        String note = item.getNote();
-        String dateLabel = formatDate(item.getDate());
-
+                : context.getString(R.string.transaction_unknown_category);
+                
         holder.title.setText(category);
         String amountValue = TransactionStore.formatCurrency(item.getAmount());
         String amountLabel = isExpense
-                ? holder.itemView.getContext().getString(R.string.amount_prefix_expense, amountValue)
-                : holder.itemView.getContext().getString(R.string.amount_prefix_income, amountValue);
+                ? context.getString(R.string.amount_prefix_expense, amountValue)
+                : context.getString(R.string.amount_prefix_income, amountValue);
+        
         holder.amount.setText(amountLabel);
         int amountColor = isExpense
                 ? context.getColor(R.color.accent_red)
                 : context.getColor(R.color.accent_green);
         holder.amount.setTextColor(amountColor);
 
+        String dateLabel = formatDate(item.getDate());
+        String note = item.getNote();
         String label = isExpense
-                ? holder.itemView.getContext().getString(R.string.transaction_expense_label)
-                : holder.itemView.getContext().getString(R.string.transaction_income_label);
-        String separator = holder.itemView.getContext().getString(R.string.separator_dot);
+                ? context.getString(R.string.transaction_expense_label)
+                : context.getString(R.string.transaction_income_label);
+        String separator = context.getString(R.string.separator_dot);
+        
         StringBuilder subtitle = new StringBuilder(label);
         if (note != null && !note.isEmpty()) {
             subtitle.append(separator).append(note);
@@ -57,6 +70,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             subtitle.append(separator).append(dateLabel);
         }
         holder.subtitle.setText(subtitle.toString());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTransactionClick(item);
+            }
+        });
     }
 
     @Override
@@ -86,13 +105,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     private String formatDate(String rawDate) {
-        if (rawDate == null || rawDate.isEmpty()) {
-            return "";
-        }
+        if (rawDate == null || rawDate.isEmpty()) return "";
         String[] parts = rawDate.split("T");
-        if (parts.length > 0 && !parts[0].isEmpty()) {
-            return parts[0];
-        }
-        return rawDate;
+        return parts.length > 0 ? parts[0] : rawDate;
     }
 }

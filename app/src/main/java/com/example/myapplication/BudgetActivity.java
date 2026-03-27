@@ -47,23 +47,22 @@ public class BudgetActivity extends AppCompatActivity {
 
         btnAddBudget.setOnClickListener(v -> showAddBudgetDialog());
 
+        bottomNav.setSelectedItemId(R.id.menu_budget);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.menu_home) {
                 startActivity(new Intent(this, MainActivity.class));
-                finish();
+                return true;
+            } else if (id == R.id.menu_budget) {
                 return true;
             } else if (id == R.id.menu_add) {
                 startActivity(new Intent(this, AddTransactionActivity.class));
-                finish();
                 return true;
             } else if (id == R.id.menu_stats) {
                 startActivity(new Intent(this, StatisticsActivity.class));
-                finish();
                 return true;
             } else if (id == R.id.menu_profile) {
                 startActivity(new Intent(this, ProfileActivity.class));
-                finish();
                 return true;
             }
             return false;
@@ -83,7 +82,6 @@ public class BudgetActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 }
             }
-
             @Override
             public void onFailure(Call<List<BudgetResponse>> call, Throwable t) {
                 Toast.makeText(BudgetActivity.this, "Lỗi tải ngân sách", Toast.LENGTH_SHORT).show();
@@ -110,30 +108,38 @@ public class BudgetActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             String category = spinnerCategory.getSelectedItem().toString();
             String limitStr = edtLimit.getText().toString();
-            if (limitStr.isEmpty()) return;
+            if (limitStr.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập số tiền", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             long limit = Long.parseLong(limitStr);
-            saveBudget(category, limit, dialog);
+            saveBudgetToServer(category, limit, dialog);
         });
 
         dialog.show();
     }
 
-    private void saveBudget(String category, long limit, AlertDialog dialog) {
-        // We need a way to wrap this in BudgetResponse or a Request object
-        // For simplicity, let's assume saveBudget endpoint accepts a specific structure
-        // Using a temporary hack or a proper BudgetRequest class would be better
-        // I'll create a simple BudgetResponse object as request (since names match)
+    private void saveBudgetToServer(String category, long limit, AlertDialog dialog) {
+        BudgetResponse request = new BudgetResponse(category, limit);
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
         
-        // Actually, let's just use the ApiService method as defined
-        // @POST("budgets") Call<ResponseBody> saveBudget(@Body BudgetResponse budget);
-        // Note: BudgetResponse doesn't have a public constructor or setters in my previous write.
-        // Let me fix that by making a BudgetRequest.
-        
-        // For now, I'll just skip detailed implementation of saveBudget 
-        // until I verify if I can edit BudgetResponse.
-        
-        dialog.dismiss();
-        Toast.makeText(this, "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show();
+        apiService.saveBudget(request).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(BudgetActivity.this, "Đã thiết lập ngân sách", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    fetchBudgets();
+                } else {
+                    Toast.makeText(BudgetActivity.this, "Không thể lưu ngân sách", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(BudgetActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
