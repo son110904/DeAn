@@ -36,6 +36,8 @@ def migrate_legacy_schema():
                         "ON transactions (user_id)"
                     )
                 )
+            if "date" not in transaction_columns:
+                connection.execute(text("ALTER TABLE transactions ADD COLUMN date VARCHAR"))
 
 
 def get_db():

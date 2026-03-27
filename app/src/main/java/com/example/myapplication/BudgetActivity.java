@@ -107,13 +107,14 @@ public class BudgetActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> {
             String category = spinnerCategory.getSelectedItem().toString();
-            String limitStr = edtLimit.getText().toString();
-            if (limitStr.isEmpty()) {
+            String limitStr = edtLimit.getText().toString().trim();
+            String digits = limitStr.replaceAll("[^\\d]", "");
+            if (digits.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập số tiền", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            long limit = Long.parseLong(limitStr);
+            long limit = Long.parseLong(digits);
             saveBudgetToServer(category, limit, dialog);
         });
 
@@ -143,3 +144,4 @@ public class BudgetActivity extends AppCompatActivity {
         });
     }
 }
+

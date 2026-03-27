@@ -31,6 +31,7 @@ public interface ApiService {
     @DELETE("transactions/{id}")
     Call<ResponseBody> deleteTransaction(@Path("id") int id);
 
+
     @GET("statistics/monthly")
     Call<List<MonthlyStatisticResponse>> getMonthlyStatistics();
 

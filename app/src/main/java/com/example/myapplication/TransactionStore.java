@@ -74,7 +74,8 @@ public class TransactionStore {
             }
 
             if (!transactions.isEmpty()) {
-                TransactionResponse latest = transactions.get(transactions.size() - 1);
+                // API returns newest-first, so first item is latest transaction.
+                TransactionResponse latest = transactions.get(0);
                 String label = "income".equalsIgnoreCase(latest.getType())
                         ? context.getString(R.string.transaction_income_label)
                         : context.getString(R.string.transaction_expense_label);

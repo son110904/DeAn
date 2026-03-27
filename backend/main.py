@@ -1,6 +1,6 @@
 import re
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Body, Depends, FastAPI, Header, HTTPException, Query, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -79,9 +79,68 @@ def create_transaction(
     return crud.create_transaction(db, payload, user_id=current_user.id)
 
 
+@app.put("/transactions/{transaction_id}", response_model=schemas.TransactionRead)
+def update_transaction(
+    transaction_id: int,
+    payload: schemas.TransactionCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    transaction = crud.update_transaction(db, transaction_id, payload, user_id=current_user.id)
+    if not transaction:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+    return transaction
+
+
+@app.delete("/transactions/{transaction_id}")
+def delete_transaction(
+    transaction_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    deleted = crud.delete_transaction(db, transaction_id, user_id=current_user.id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+    return {"ok": True}
+
+
 @app.get("/statistics/monthly", response_model=list[schemas.MonthlyStatistic])
 def get_monthly_statistics(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
     return crud.get_monthly_statistics(db, user_id=current_user.id)
+
+
+@app.get("/summary/daily", response_model=list[schemas.DailySpending])
+def get_daily_summary(
+    month: str = Query(default=""),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return crud.get_daily_summary(db, user_id=current_user.id, month=month)
+
+
+@app.get("/budgets", response_model=list[schemas.BudgetRead])
+def get_budgets(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return crud.get_budgets_with_spending(db, user_id=current_user.id)
+
+
+@app.post("/budgets")
+def save_budget(
+    payload: schemas.BudgetCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    budget = crud.upsert_budget(db, payload, user_id=current_user.id)
+    return {"id": budget.id}
+
+
+@app.post("/qr/analyze", response_model=schemas.TransactionCreate)
+def analyze_qr(
+    payload: str = Body(default="", embed=False),
+):
+    return crud.analyze_qr_content(payload)

@@ -84,6 +84,10 @@ public class StatisticsActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MainActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
+            } else if (id == R.id.menu_budget) {
+                startActivity(new Intent(this, BudgetActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
             } else if (id == R.id.menu_add) {
                 startActivity(new Intent(this, AddTransactionActivity.class));
                 overridePendingTransition(0, 0);
@@ -150,16 +154,18 @@ public class StatisticsActivity extends AppCompatActivity {
         spinnerMonthYear.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                updateBudgetByMonth(monthKeys.get(position));
-                fetchDailySummary(monthKeys.get(position));
+                String selectedMonth = monthKeys.get(position);
+                updateBudgetByMonth(selectedMonth);
+                fetchDailySummary(resolveDailySummaryMonth(selectedMonth));
             }
 
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
             }
         });
-        updateBudgetByMonth(monthKeys.get(0));
-        fetchDailySummary(monthKeys.get(0));
+        String initialMonth = monthKeys.get(0);
+        updateBudgetByMonth(initialMonth);
+        fetchDailySummary(resolveDailySummaryMonth(initialMonth));
     }
 
     private void updateBudgetByMonth(String monthKey) {
@@ -289,6 +295,16 @@ public class StatisticsActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<DailySpendingResponse>> call, Throwable t) {}
         });
+    }
+
+    private String resolveDailySummaryMonth(String selectedMonth) {
+        if (selectedMonth == null || selectedMonth.isEmpty()) {
+            return "";
+        }
+        if (selectedMonth.equals(getString(R.string.statistics_all_months))) {
+            return "";
+        }
+        return selectedMonth;
     }
 
     private void renderLineChart(List<DailySpendingResponse> dailyData) {

@@ -67,12 +67,51 @@ def create_transaction(db: Session, transaction: schemas.TransactionCreate, user
         category=transaction.category,
         type=transaction.type,
         note=transaction.note,
+        date=transaction.date,
         user_id=user_id,
     )
     db.add(db_transaction)
     db.commit()
     db.refresh(db_transaction)
     return db_transaction
+
+
+def get_transaction_by_id(db: Session, transaction_id: int, user_id: int):
+    return (
+        db.query(models.Transaction)
+        .filter(models.Transaction.id == transaction_id, models.Transaction.user_id == user_id)
+        .first()
+    )
+
+
+def update_transaction(
+    db: Session,
+    transaction_id: int,
+    payload: schemas.TransactionCreate,
+    user_id: int,
+):
+    db_transaction = get_transaction_by_id(db, transaction_id, user_id)
+    if not db_transaction:
+        return None
+
+    db_transaction.amount = payload.amount
+    db_transaction.category = payload.category
+    db_transaction.type = payload.type
+    db_transaction.note = payload.note
+    db_transaction.date = payload.date
+    db.commit()
+    db.refresh(db_transaction)
+    return db_transaction
+
+
+def delete_transaction(db: Session, transaction_id: int, user_id: int):
+    db_transaction = get_transaction_by_id(db, transaction_id, user_id)
+    if not db_transaction:
+        return False
+
+    db.delete(db_transaction)
+    db.commit()
+    return True
 
 
 def get_monthly_statistics(db: Session, user_id: int):
@@ -85,10 +124,10 @@ def get_monthly_statistics(db: Session, user_id: int):
     grouped = defaultdict(lambda: {"income": 0, "expense": 0})
 
     for row in rows:
-        created_at = row.created_at
-        if isinstance(created_at, str):
-            created_at = datetime.fromisoformat(created_at)
-        month_key = created_at.strftime("%Y-%m")
+        date_value = _extract_transaction_date(row)
+        if not date_value:
+            continue
+        month_key = date_value[:7]
         if row.type.lower() == "income":
             grouped[month_key]["income"] += row.amount
         else:
@@ -98,3 +137,110 @@ def get_monthly_statistics(db: Session, user_id: int):
         schemas.MonthlyStatistic(month=month, income=value["income"], expense=value["expense"])
         for month, value in grouped.items()
     ]
+
+
+def get_daily_summary(db: Session, user_id: int, month: str):
+    rows = (
+        db.query(models.Transaction)
+        .filter(models.Transaction.user_id == user_id, models.Transaction.type.ilike("expense"))
+        .all()
+    )
+
+    grouped = defaultdict(int)
+    for row in rows:
+        date_value = _extract_transaction_date(row)
+        if not date_value:
+            continue
+        if month and date_value[:7] != month:
+            continue
+        grouped[date_value] += row.amount
+
+    return [
+        schemas.DailySpending(date=date_key, amount=amount)
+        for date_key, amount in sorted(grouped.items())
+    ]
+
+
+def upsert_budget(db: Session, payload: schemas.BudgetCreate, user_id: int):
+    budget = (
+        db.query(models.Budget)
+        .filter(
+            models.Budget.user_id == user_id,
+            models.Budget.category == payload.category,
+        )
+        .first()
+    )
+    if budget:
+        budget.limit_amount = payload.limit_amount
+    else:
+        budget = models.Budget(
+            category=payload.category,
+            limit_amount=payload.limit_amount,
+            user_id=user_id,
+        )
+        db.add(budget)
+
+    db.commit()
+    db.refresh(budget)
+    return budget
+
+
+def get_budgets_with_spending(db: Session, user_id: int):
+    budgets = (
+        db.query(models.Budget)
+        .filter(models.Budget.user_id == user_id)
+        .order_by(models.Budget.category.asc())
+        .all()
+    )
+    transactions = (
+        db.query(models.Transaction)
+        .filter(models.Transaction.user_id == user_id, models.Transaction.type.ilike("expense"))
+        .all()
+    )
+
+    spending_by_category = defaultdict(int)
+    for transaction in transactions:
+        category = (transaction.category or "").strip()
+        if category:
+            spending_by_category[category] += transaction.amount
+
+    return [
+        schemas.BudgetRead(
+            id=budget.id,
+            category=budget.category,
+            limit_amount=budget.limit_amount,
+            current_spent=spending_by_category.get(budget.category, 0),
+        )
+        for budget in budgets
+    ]
+
+
+def analyze_qr_content(content: str):
+    text = (content or "").strip()
+    amount = 0
+    for token in text.replace(",", " ").split():
+        digits = "".join(ch for ch in token if ch.isdigit())
+        if digits:
+            amount = max(amount, int(digits))
+
+    return schemas.TransactionCreate(
+        amount=amount,
+        category="Khac",
+        type="expense",
+        note=text[:200] if text else None,
+        date=datetime.now().date().isoformat(),
+    )
+
+
+def _extract_transaction_date(row: models.Transaction):
+    if row.date:
+        return row.date.split("T")[0]
+    created_at = row.created_at
+    if isinstance(created_at, str):
+        try:
+            created_at = datetime.fromisoformat(created_at)
+        except ValueError:
+            return ""
+    if created_at:
+        return created_at.strftime("%Y-%m-%d")
+    return ""

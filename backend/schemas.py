@@ -34,6 +34,7 @@ class TransactionBase(BaseModel):
     category: str
     type: str
     note: Optional[str] = None
+    date: Optional[str] = None
 
 
 class TransactionCreate(TransactionBase):
@@ -52,3 +53,25 @@ class MonthlyStatistic(BaseModel):
     month: str
     income: int
     expense: int
+
+
+class DailySpending(BaseModel):
+    date: str
+    amount: int
+
+
+class BudgetCreate(BaseModel):
+    category: str
+    limit_amount: int
+
+
+class BudgetRead(BudgetCreate):
+    id: int
+    current_spent: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class QrAnalyzeRequest(BaseModel):
+    content: str

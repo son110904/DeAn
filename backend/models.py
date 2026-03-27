@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -26,7 +26,18 @@ class Transaction(Base):
     category = Column(String, nullable=False)
     type = Column(String, nullable=False)
     note = Column(String, nullable=True)
+    date = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="transactions")
+
+
+class Budget(Base):
+    __tablename__ = "budgets"
+    __table_args__ = (UniqueConstraint("user_id", "category", name="uq_budgets_user_category"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    category = Column(String, nullable=False)
+    limit_amount = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)

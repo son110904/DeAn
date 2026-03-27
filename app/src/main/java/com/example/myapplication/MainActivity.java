@@ -61,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.menu_home) {
                 return true;
+            } else if (id == R.id.menu_budget) {
+                startActivity(new Intent(this, BudgetActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
             } else if (id == R.id.menu_add) {
                 startActivity(new Intent(this, AddTransactionActivity.class));
                 overridePendingTransition(0, 0);
