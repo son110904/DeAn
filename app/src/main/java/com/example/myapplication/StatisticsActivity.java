@@ -43,10 +43,8 @@ public class StatisticsActivity extends AppCompatActivity {
     TextView tvBudgetRemaining;
     TextView tvBudgetPercent;
     TextView tvBudgetSpent;
-    TextView tvBudgetRemainingValue;
     TextView tvBudgetTotal;
     ProgressBar progressBudgetTotal;
-    LinearLayout budgetCategoryContainer;
     LinearLayout topTransactionsContainer;
     Spinner spinnerMonthYear;
     PieChart pieChartCategory;
@@ -64,10 +62,8 @@ public class StatisticsActivity extends AppCompatActivity {
         tvBudgetRemaining = findViewById(R.id.tvBudgetRemaining);
         tvBudgetPercent = findViewById(R.id.tvBudgetPercent);
         tvBudgetSpent = findViewById(R.id.tvBudgetSpent);
-        tvBudgetRemainingValue = findViewById(R.id.tvBudgetRemainingValue);
         tvBudgetTotal = findViewById(R.id.tvBudgetTotal);
         progressBudgetTotal = findViewById(R.id.progressBudgetTotal);
-        budgetCategoryContainer = findViewById(R.id.budgetCategoryContainer);
         topTransactionsContainer = findViewById(R.id.topTransactionsContainer);
         spinnerMonthYear = findViewById(R.id.spinnerMonthYear);
         pieChartCategory = findViewById(R.id.pieChartCategory);
@@ -204,15 +200,13 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private void applyBudgetSummary(long incomeTotal, long expenseTotal, Map<String, Long> categoryTotals, long remaining) {
         tvBudgetRemaining.setText(TransactionStore.formatCurrency(remaining));
-        tvBudgetTotal.setText(TransactionStore.formatCurrency(incomeTotal));
-        tvBudgetSpent.setText(TransactionStore.formatCurrency(expenseTotal));
-        tvBudgetRemainingValue.setText(TransactionStore.formatCurrency(Math.max(remaining, 0)));
+        tvBudgetTotal.setText("● Income: " + TransactionStore.formatCurrency(incomeTotal));
+        tvBudgetSpent.setText("● Expenses: " + TransactionStore.formatCurrency(expenseTotal));
 
         int percent = incomeTotal > 0 ? Math.min(100, Math.round((expenseTotal * 100f) / incomeTotal)) : 0;
-        tvBudgetPercent.setText(getString(R.string.percent_format, percent));
+        tvBudgetPercent.setText(percent + "% of Income");
         progressBudgetTotal.setProgress(percent);
 
-        renderCategories(expenseTotal, categoryTotals);
         renderPieChart(categoryTotals, expenseTotal);
     }
 
@@ -254,7 +248,7 @@ public class StatisticsActivity extends AppCompatActivity {
             return;
         }
 
-        pieChartCategory.setCenterText(getString(R.string.statistics_expense_chart_center_text, TransactionStore.formatCurrency(expenseTotal)));
+        pieChartCategory.setCenterText("TOTAL\n" + TransactionStore.formatCurrency(expenseTotal));
 
         List<Map.Entry<String, Long>> sortedEntries = new ArrayList<>(categoryTotals.entrySet());
         sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
@@ -298,12 +292,8 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private String resolveDailySummaryMonth(String selectedMonth) {
-        if (selectedMonth == null || selectedMonth.isEmpty()) {
-            return "";
-        }
-        if (selectedMonth.equals(getString(R.string.statistics_all_months))) {
-            return "";
-        }
+        if (selectedMonth == null || selectedMonth.isEmpty()) return "";
+        if (selectedMonth.equals(getString(R.string.statistics_all_months))) return "";
         return selectedMonth;
     }
 
@@ -312,11 +302,13 @@ public class StatisticsActivity extends AppCompatActivity {
         for (int i = 0; i < dailyData.size(); i++) {
             entries.add(new Entry(i + 1, dailyData.get(i).getAmount()));
         }
-        LineDataSet dataSet = new LineDataSet(entries, "Chi tiêu theo ngày");
-        dataSet.setColor(ContextCompat.getColor(this, R.color.primary_blue));
+        LineDataSet dataSet = new LineDataSet(entries, "Spending Trends");
+        dataSet.setColor(ContextCompat.getColor(this, R.color.primary_teal));
         dataSet.setLineWidth(2f);
         dataSet.setCircleRadius(4f);
         dataSet.setDrawValues(false);
+        dataSet.setDrawFilled(true);
+        dataSet.setFillDrawable(ContextCompat.getDrawable(this, R.drawable.bg_gradient_chart));
 
         LineData data = new LineData(dataSet);
         lineChartDaily.setData(data);
@@ -336,62 +328,14 @@ public class StatisticsActivity extends AppCompatActivity {
             TextView amount = view.findViewById(R.id.tvTransactionAmount);
             title.setText(t.getCategory());
             amount.setText(TransactionStore.formatCurrency(t.getAmount()));
-            amount.setTextColor(ContextCompat.getColor(this, "expense".equals(t.getType()) ? R.color.accent_red : R.color.primary_blue));
+            amount.setTextColor(ContextCompat.getColor(this, "expense".equals(t.getType()) ? R.color.accent_red : R.color.accent_green));
             topTransactionsContainer.addView(view);
             count++;
         }
     }
 
-    private void renderCategories(long expenseTotal, Map<String, Long> categoryTotals) {
-        budgetCategoryContainer.removeAllViews();
-        LayoutInflater inflater = LayoutInflater.from(this);
-        if (expenseTotal <= 0 || categoryTotals.isEmpty()) {
-            TextView emptyView = new TextView(this);
-            emptyView.setText(getString(R.string.statistics_no_category));
-            emptyView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-            emptyView.setTextSize(14);
-            int padding = dpToPx(16);
-            emptyView.setPadding(padding, padding, padding, padding);
-            budgetCategoryContainer.addView(emptyView);
-            return;
-        }
-
-        List<Map.Entry<String, Long>> sortedEntries = new ArrayList<>(categoryTotals.entrySet());
-        sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-
-        for (Map.Entry<String, Long> entry : sortedEntries) {
-            long spent = entry.getValue();
-            if (spent <= 0) continue;
-
-            View itemView = inflater.inflate(R.layout.item_budget_category, budgetCategoryContainer, false);
-            TextView nameView = itemView.findViewById(R.id.tvCategoryName);
-            TextView amountView = itemView.findViewById(R.id.tvCategoryAmount);
-            TextView percentView = itemView.findViewById(R.id.tvCategoryPercent);
-            TextView spentView = itemView.findViewById(R.id.tvCategorySpent);
-            ProgressBar progressBar = itemView.findViewById(R.id.progressCategory);
-
-            nameView.setText(entry.getKey());
-            amountView.setText(TransactionStore.formatCurrency(spent));
-            int percent = (int) ((spent * 100f) / expenseTotal);
-            percentView.setText(getString(R.string.percent_format, percent));
-            spentView.setText(getString(R.string.statistics_spent_prefix, TransactionStore.formatCurrency(spent)));
-            progressBar.setProgress(percent);
-
-            budgetCategoryContainer.addView(itemView);
-        }
-    }
-
-    private String extractMonthKey(String date) {
-        if (date == null || !date.contains("-")) return "";
-        String[] parts = date.split("T")[0].split("-");
-        if (parts.length >= 2) {
-            return parts[0] + "-" + parts[1];
-        }
-        return "";
-    }
-
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round((float) dp * density);
+    private String extractMonthKey(String createdAt) {
+        if (createdAt == null || createdAt.length() < 7) return "";
+        return createdAt.substring(0, 7);
     }
 }

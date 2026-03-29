@@ -4,26 +4,26 @@
     <item
         android:id="@+id/menu_home"
         android:icon="@android:drawable/ic_menu_view"
-        android:title="@string/nav_home"/>
-
-    <item
-        android:id="@+id/menu_budget"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="Ngân sách"/>
+        android:title="DASHBOARD"/>
 
     <item
         android:id="@+id/menu_add"
-        android:icon="@android:drawable/ic_input_add"
-        android:title="@string/nav_add"/>
+        android:icon="@android:drawable/ic_menu_revert"
+        android:title="ACTIVITY"/>
 
     <item
         android:id="@+id/menu_stats"
         android:icon="@android:drawable/ic_menu_agenda"
-        android:title="@string/nav_stats"/>
+        android:title="STATS"/>
+
+    <item
+        android:id="@+id/menu_budget"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="BUDGET"/>
 
     <item
         android:id="@+id/menu_profile"
         android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="@string/nav_profile"/>
+        android:title="PROFILE"/>
 
 </menu>
