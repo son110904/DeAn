@@ -3,7 +3,6 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,39 +10,31 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ProfileActivity extends AppCompatActivity {
-
-    TextView tvProfileName, tvProfileEmail;
-    Button btnLogout;
-    ImageButton btnProfileSettings;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        tvProfileName = findViewById(R.id.tvProfileName);
-        tvProfileEmail = findViewById(R.id.tvProfileEmail);
-        btnLogout = findViewById(R.id.btnLogout);
-        btnProfileSettings = findViewById(R.id.btnProfileSettings);
+        TextView tvName = findViewById(R.id.tvProfileName);
+        TextView tvEmail = findViewById(R.id.tvProfileEmail);
+        Button btnLogout = findViewById(R.id.btnLogout);
+        Button btnSettings = findViewById(R.id.btnSettings);
 
-        tvProfileName.setText(AuthStore.getName(this));
-        tvProfileEmail.setText(AuthStore.getEmail(this));
+        tvName.setText(AuthStore.getName(this));
+        tvEmail.setText(AuthStore.getEmail(this));
 
-        btnProfileSettings.setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
-        });
+        btnSettings.setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class))
+        );
 
         btnLogout.setOnClickListener(v -> {
             AuthStore.clear(this);
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            startActivity(new Intent(this, LoginActivity.class));
+            finishAffinity();
         });
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.menu_profile);
-
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.menu_home) {

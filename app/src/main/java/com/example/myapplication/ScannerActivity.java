@@ -7,8 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,10 +46,10 @@ public class ScannerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scanner);
 
         previewView = findViewById(R.id.previewView);
-        ImageButton btnScannerClose = findViewById(R.id.btnScannerClose);
-        LinearLayout btnGallery = findViewById(R.id.btnGallery);
+        Button btnCancel = findViewById(R.id.btnCancel);
+        Button btnGallery = findViewById(R.id.btnGallery);
 
-        btnScannerClose.setOnClickListener(v -> finish());
+        btnCancel.setOnClickListener(v -> finish());
         btnGallery.setOnClickListener(v -> openGallery());
 
         cameraExecutor = Executors.newSingleThreadExecutor();

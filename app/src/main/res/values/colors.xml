@@ -3,34 +3,31 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Theme Colors -->
-    <color name="primary_dark">#004D5B</color>
-    <color name="primary_teal">#006070</color>
-    <color name="accent_blue">#00B4D8</color>
-    
     <!-- Background colors -->
-    <color name="app_background">#F8FAFC</color>
+    <color name="app_background">#F4F2FF</color>
     <color name="card_background">#FFFFFF</color>
 
     <!-- Text colors -->
-    <color name="text_primary">#1E293B</color>
-    <color name="text_secondary">#64748B</color>
-    <color name="text_light">#94A3B8</color>
+    <color name="text_primary">#2D2A3F</color>
+    <color name="text_secondary">#8E8CB0</color>
+    <color name="text_light">#C2C0D6</color>
 
-    <!-- Status Colors -->
-    <color name="accent_red">#EF4444</color>
-    <color name="accent_green">#10B981</color>
-    <color name="accent_yellow">#F59E0B</color>
+    <!-- Accent colors -->
+    <color name="primary_blue">#6C63FF</color>
+    <color name="accent_red">#FF6B6B</color>
+    <color name="accent_green">#34C38F</color>
+    <color name="accent_orange">#F5A623</color>
+    <color name="accent_purple">#7B6DFF</color>
+
+    <!-- Chart colors -->
+    <color name="chart_blue">#6C63FF</color>
+    <color name="chart_green">#34C38F</color>
+    <color name="chart_yellow">#F5A623</color>
+    <color name="chart_red">#FF6B6B</color>
 
     <!-- UI elements -->
-    <color name="divider_light">#E2E8F0</color>
-    <color name="input_background">#E2E8F0</color>
-    <color name="pill_background">#F1F5F9</color>
-    <color name="segment_background">#E2E8F0</color>
-    
-    <!-- Compatibility & Charts -->
-    <color name="primary_blue">#006070</color>
-    <color name="accent_purple">#004D5B</color>
-    <color name="chart_blue">#00B4D8</color>
-    <color name="chart_red">#EF4444</color>
+    <color name="divider_light">#E6E7F2</color>
+    <color name="segment_background">#EEEFFF</color>
+    <color name="pill_background">#F3F4FA</color>
+    <color name="shadow">#1A000000</color>
 </resources>
