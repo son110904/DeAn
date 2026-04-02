@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -9,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
+    public static final String EXTRA_SETUP_MODE = "setup_mode";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,12 +35,25 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show()
         );
 
+        boolean setupMode = getIntent().getBooleanExtra(EXTRA_SETUP_MODE, false);
+
         btnSaveServer.setOnClickListener(v -> {
             String enteredValue = etServerUrl.getText().toString();
             String normalized = ApiConfigStore.normalize(enteredValue);
+            if (normalized.isEmpty()) {
+                Toast.makeText(this, getString(R.string.settings_server_hint), Toast.LENGTH_SHORT).show();
+                return;
+            }
             ApiConfigStore.saveBaseUrl(this, normalized);
             etServerUrl.setText(normalized);
             Toast.makeText(this, getString(R.string.toast_server_saved, normalized), Toast.LENGTH_LONG).show();
+            if (setupMode) {
+                Class<?> nextScreen = AuthStore.isLoggedIn(this)
+                        ? MainActivity.class
+                        : LoginActivity.class;
+                startActivity(new Intent(this, nextScreen));
+                finish();
+            }
         });
 
         btnClearData.setOnClickListener(v -> {
