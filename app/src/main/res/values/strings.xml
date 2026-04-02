@@ -136,6 +136,8 @@
     <string name="transactions_add_button">Thêm giao dịch</string>
 
     <!-- Navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_add">Thêm</string>
     <string name="nav_dashboard">DASHBOARD</string>
     <string name="nav_activity">ACTIVITY</string>
     <string name="nav_stats">STATS</string>
