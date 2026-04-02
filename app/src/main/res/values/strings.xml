@@ -156,6 +156,46 @@
     <string name="category_other_icon">💰 Khác</string>
     <string name="category_add_more">Thêm</string>
 
+    <!-- Transaction Labels -->
+    <string name="transaction_income_label">Thu nhập</string>
+    <string name="transaction_expense_label">Chi tiêu</string>
+    <string name="transaction_income_default">Thu nhập</string>
+    <string name="transaction_expense_default">Chi tiêu</string>
+    <string name="transaction_unknown_category">Không rõ danh mục</string>
+    <string name="transaction_other_label">Khác</string>
+    <string name="transaction_summary">%1$s • %2$s</string>
+    <string name="amount_prefix_income">+%1$s đ</string>
+    <string name="amount_prefix_expense">-%1$s đ</string>
+    <string name="separator_dot"> • </string>
+
+    <!-- Main Dashboard -->
+    <string name="main_see_all">Xem tất cả</string>
+    <string name="main_collapse">Thu gọn</string>
+
+    <!-- Statistics -->
+    <string name="statistics_all_months">Tất cả</string>
+    <string name="statistics_expense_chart_center_text">Chi tiêu\n%1$s</string>
+    <string name="statistics_expense_categories">Danh mục chi tiêu</string>
+    <string name="statistics_no_category">Chưa có dữ liệu.</string>
+    <string name="statistics_spent_prefix">%1$s đ</string>
+    <string name="percent_format">%1.1f%%</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_add_missing">Vui lòng điền đầy đủ thông tin.</string>
+    <string name="toast_add_success">Thêm giao dịch thành công!</string>
+    <string name="toast_login_missing">Vui lòng nhập email và mật khẩu.</string>
+    <string name="toast_login_failed">Đăng nhập thất bại. Vui lòng thử lại.</string>
+    <string name="toast_register_missing">Vui lòng điền đầy đủ thông tin.</string>
+    <string name="toast_register_mismatch">Mật khẩu xác nhận không khớp.</string>
+    <string name="toast_register_success">Đăng ký thành công!</string>
+    <string name="toast_register_failed">Đăng ký thất bại. Vui lòng thử lại.</string>
+    <string name="toast_switching_language">Đang chuyển ngôn ngữ…</string>
+    <string name="toast_dark_mode_on">Đã bật chế độ tối.</string>
+    <string name="toast_dark_mode_off">Đã tắt chế độ tối.</string>
+    <string name="toast_server_saved">Đã lưu server: %1$s</string>
+    <string name="toast_clear_data">Đã xóa dữ liệu cục bộ.</string>
+    <string name="toast_transactions_failed">Không thể tải giao dịch.</string>
+
     <!-- Generic & Placeholder -->
     <string name="placeholder_currency_zero">0đ</string>
     <string name="placeholder_percent_zero">0%%</string>
@@ -164,5 +204,18 @@
     <string name="toast_connection_error">Lỗi kết nối: %1$s</string>
 
     <!-- Removed Forecast Strings -->
+
+
+    <string-array name="transaction_categories">
+        <item>🍜 Ăn uống</item>
+        <item>🚗 Di chuyển</item>
+        <item>🏠 Nhà ở &amp; Tiện ích</item>
+        <item>🎮 Giải trí</item>
+        <item>🛒 Mua sắm</item>
+        <item>💊 Y tế</item>
+        <item>📚 Giáo dục</item>
+        <item>🖼️ Sở thích</item>
+        <item>💰 Khác</item>
+    </string-array>
 
 </resources>

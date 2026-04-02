@@ -47,6 +47,13 @@
                         android:textColor="@color/primary_dark"
                         android:textSize="18sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvGreetingName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <ImageButton
@@ -290,6 +297,14 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Bar Chart -->
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barChart"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="24dp" />
+
             <!-- Recent Transactions -->
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -306,7 +321,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvMainViewAll"
+                    android:id="@+id/tvSeeAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -326,7 +341,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/tvMainNoTransactions"
+                android:id="@+id/tvNoTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
