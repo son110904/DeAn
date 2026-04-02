@@ -109,6 +109,32 @@
     <string name="profile_help_feedback">Trợ giúp &amp; Phản hồi</string>
     <string name="profile_logout_button">Đăng xuất</string>
 
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_language_title">Ngôn ngữ</string>
+    <string name="settings_language_button">Tiếng Việt</string>
+    <string name="settings_interface_title">Giao diện</string>
+    <string name="settings_dark_mode">Chế độ tối</string>
+    <string name="settings_server_title">Cấu hình Server</string>
+    <string name="settings_server_hint">Nhập địa chỉ server</string>
+    <string name="settings_server_save">Lưu</string>
+    <string name="settings_server_note">Thay đổi sẽ có hiệu lực sau khi khởi động lại ứng dụng.</string>
+    <string name="settings_data_title">Dữ liệu</string>
+    <string name="settings_clear_data_button">Xóa dữ liệu cục bộ</string>
+
+    <!-- Splash -->
+    <string name="splash_title">Quản lý chi tiêu</string>
+
+    <!-- Statistics -->
+    <string name="statistics_diff_label">So với tháng trước</string>
+    <string name="statistics_select_month_year">Chọn tháng / năm</string>
+    <string name="statistics_ratio_label">Tỷ lệ chi tiêu</string>
+
+    <!-- Transactions -->
+    <string name="transactions_title">Giao dịch</string>
+    <string name="transactions_empty">Chưa có giao dịch nào.</string>
+    <string name="transactions_add_button">Thêm giao dịch</string>
+
     <!-- Navigation -->
     <string name="nav_dashboard">DASHBOARD</string>
     <string name="nav_activity">ACTIVITY</string>
