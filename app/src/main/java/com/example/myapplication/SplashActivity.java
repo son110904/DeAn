@@ -16,10 +16,18 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Class<?> nextScreen = AuthStore.isLoggedIn(this)
-                    ? MainActivity.class
-                    : LoginActivity.class;
-            startActivity(new Intent(this, nextScreen));
+            String baseUrl = ApiConfigStore.getBaseUrl(this);
+            Intent intent;
+            if (baseUrl.isEmpty()) {
+                intent = new Intent(this, SettingsActivity.class);
+                intent.putExtra(SettingsActivity.EXTRA_SETUP_MODE, true);
+            } else {
+                Class<?> nextScreen = AuthStore.isLoggedIn(this)
+                        ? MainActivity.class
+                        : LoginActivity.class;
+                intent = new Intent(this, nextScreen);
+            }
+            startActivity(intent);
             finish();
         }, SPLASH_DELAY_MS);
     }
