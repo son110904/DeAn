@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -219,28 +220,44 @@ public class StatisticsActivity extends AppCompatActivity {
     private void setupPieChart() {
         pieChartCategory.setUsePercentValues(true);
         pieChartCategory.getDescription().setEnabled(false);
-        pieChartCategory.setExtraOffsets(5, 10, 5, 5);
+        pieChartCategory.setExtraOffsets(20, 0, 20, 0); 
         pieChartCategory.setDragDecelerationFrictionCoef(0.95f);
         pieChartCategory.setDrawHoleEnabled(true);
         pieChartCategory.setHoleColor(Color.WHITE);
         pieChartCategory.setTransparentCircleColor(Color.WHITE);
         pieChartCategory.setTransparentCircleAlpha(110);
-        pieChartCategory.setHoleRadius(58f);
-        pieChartCategory.setTransparentCircleRadius(61f);
+        pieChartCategory.setHoleRadius(50f); 
+        pieChartCategory.setTransparentCircleRadius(54f);
         pieChartCategory.setDrawCenterText(true);
         pieChartCategory.setRotationAngle(0);
         pieChartCategory.setRotationEnabled(true);
         pieChartCategory.setHighlightPerTapEnabled(true);
-        pieChartCategory.setCenterTextSize(10f);
-        pieChartCategory.getLegend().setEnabled(false);
+        pieChartCategory.setCenterTextSize(12f);
+        pieChartCategory.getLegend().setEnabled(true);
+        pieChartCategory.getLegend().setVerticalAlignment(com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.BOTTOM);
+        pieChartCategory.getLegend().setHorizontalAlignment(com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER);
+        pieChartCategory.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
+        pieChartCategory.getLegend().setDrawInside(false);
+        pieChartCategory.getLegend().setWordWrapEnabled(true);
     }
 
     private void setupLineChart() {
         lineChartDaily.getDescription().setEnabled(false);
         lineChartDaily.setDrawGridBackground(false);
-        lineChartDaily.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChartDaily.getXAxis().setDrawGridLines(false);
+        
+        XAxis xAxis = lineChartDaily.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f); 
+        xAxis.setLabelCount(7);
+
+        YAxis leftAxis = lineChartDaily.getAxisLeft();
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setAxisMinimum(0f); 
+
         lineChartDaily.getAxisRight().setEnabled(false);
+        lineChartDaily.setTouchEnabled(true);
+        lineChartDaily.setPinchZoom(true);
     }
 
     @SuppressLint("StringFormatInvalid")
@@ -254,7 +271,8 @@ public class StatisticsActivity extends AppCompatActivity {
             return;
         }
 
-        pieChartCategory.setCenterText(getString(R.string.statistics_expense_chart_center_text, TransactionStore.formatCurrency(expenseTotal)));
+        String centerText = "Tổng chi\n" + TransactionStore.formatCurrency(expenseTotal);
+        pieChartCategory.setCenterText(centerText);
 
         List<Map.Entry<String, Long>> sortedEntries = new ArrayList<>(categoryTotals.entrySet());
         sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
@@ -265,18 +283,25 @@ public class StatisticsActivity extends AppCompatActivity {
             }
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, getString(R.string.statistics_expense_categories));
+        PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
 
+        dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        dataSet.setValueLinePart1OffsetPercentage(80f);
+        dataSet.setValueLinePart1Length(0.2f);
+        dataSet.setValueLinePart2Length(0.4f);
+        dataSet.setValueLineColor(Color.GRAY);
+
         ArrayList<Integer> colors = new ArrayList<>();
+        for (int c : ColorTemplate.MATERIAL_COLORS) colors.add(c);
         for (int c : ColorTemplate.VORDIPLOM_COLORS) colors.add(c);
-        for (int c : ColorTemplate.JOYFUL_COLORS) colors.add(c);
         dataSet.setColors(colors);
 
         PieData data = new PieData(dataSet);
         data.setValueFormatter(new PercentFormatter(pieChartCategory));
-        data.setValueTextSize(11f);
+        data.setValueTextSize(12f);
         data.setValueTextColor(Color.BLACK);
         
         pieChartCategory.setData(data);
@@ -309,17 +334,33 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private void renderLineChart(List<DailySpendingResponse> dailyData) {
         ArrayList<Entry> entries = new ArrayList<>();
+        if (dailyData == null || dailyData.isEmpty()) {
+            lineChartDaily.clear();
+            return;
+        }
+
         for (int i = 0; i < dailyData.size(); i++) {
             entries.add(new Entry(i + 1, dailyData.get(i).getAmount()));
         }
-        LineDataSet dataSet = new LineDataSet(entries, "Chi tiêu theo ngày");
+
+        LineDataSet dataSet = new LineDataSet(entries, "Số tiền chi (VNĐ)");
         dataSet.setColor(ContextCompat.getColor(this, R.color.primary_blue));
-        dataSet.setLineWidth(2f);
-        dataSet.setCircleRadius(4f);
-        dataSet.setDrawValues(false);
+        dataSet.setLineWidth(2.5f);
+        dataSet.setCircleRadius(5f);
+        dataSet.setCircleColor(ContextCompat.getColor(this, R.color.primary_blue));
+        dataSet.setDrawCircleHole(true);
+        dataSet.setCircleHoleRadius(2.5f);
+        dataSet.setDrawValues(false); 
+        
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(ContextCompat.getColor(this, R.color.primary_blue));
+        dataSet.setFillAlpha(30);
 
         LineData data = new LineData(dataSet);
         lineChartDaily.setData(data);
+        lineChartDaily.getAxisLeft().setSpaceTop(20f);
         lineChartDaily.invalidate();
     }
 
