@@ -14,13 +14,22 @@ import java.util.List;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
     private final List<TransactionResponse> items = new ArrayList<>();
     private OnTransactionClickListener listener;
+    private OnTransactionLongClickListener longClickListener;
 
     public interface OnTransactionClickListener {
         void onTransactionClick(TransactionResponse transaction);
     }
 
+    public interface OnTransactionLongClickListener {
+        void onTransactionLongClick(TransactionResponse transaction);
+    }
+
     public void setOnTransactionClickListener(OnTransactionClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setOnTransactionLongClickListener(OnTransactionLongClickListener listener) {
+        this.longClickListener = listener;
     }
 
     @NonNull
@@ -75,6 +84,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             if (listener != null) {
                 listener.onTransactionClick(item);
             }
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onTransactionLongClick(item);
+                return true;
+            }
+            return false;
         });
     }
 

@@ -17,7 +17,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TransactionsActivity extends AppCompatActivity {
+public class TransactionsActivity extends AppCompatActivity implements TransactionActionsBottomSheet.TransactionActionsListener {
 
     private TransactionAdapter adapter;
     private TextView emptyState;
@@ -48,6 +48,11 @@ public class TransactionsActivity extends AppCompatActivity {
             intent.putExtra("note", transaction.getNote());
             intent.putExtra("date", transaction.getDate());
             startActivity(intent);
+        });
+
+        adapter.setOnTransactionLongClickListener(transaction -> {
+            TransactionActionsBottomSheet bottomSheet = TransactionActionsBottomSheet.newInstance(transaction);
+            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
         });
     }
 
@@ -88,6 +93,40 @@ public class TransactionsActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
                 adapter.submitList(null);
                 emptyState.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public void onRequestDeleteTransaction(int transactionId) {
+        showDeleteConfirmation(transactionId);
+    }
+
+    public void showDeleteConfirmation(int transactionId) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc muốn xóa giao dịch này?")
+                .setPositiveButton("Xóa", (dialog, which) -> deleteTransaction(transactionId))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void deleteTransaction(int transactionId) {
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+        apiService.deleteTransaction(transactionId).enqueue(new Callback<okhttp3.ResponseBody>() {
+            @Override
+            public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(TransactionsActivity.this, "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
+                    loadTransactions(); // Refresh the list
+                } else {
+                    Toast.makeText(TransactionsActivity.this, "Lỗi khi xóa giao dịch", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                Toast.makeText(TransactionsActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

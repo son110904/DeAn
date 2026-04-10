@@ -227,12 +227,15 @@ public class StatisticsActivity extends AppCompatActivity {
         pieChartCategory.setTransparentCircleAlpha(110);
         pieChartCategory.setHoleRadius(58f);
         pieChartCategory.setTransparentCircleRadius(61f);
-        pieChartCategory.setDrawCenterText(true);
+        pieChartCategory.setDrawCenterText(false);
         pieChartCategory.setRotationAngle(0);
         pieChartCategory.setRotationEnabled(true);
         pieChartCategory.setHighlightPerTapEnabled(true);
         pieChartCategory.setCenterTextSize(10f);
-        pieChartCategory.getLegend().setEnabled(false);
+        pieChartCategory.getLegend().setEnabled(true);
+        pieChartCategory.getLegend().setHorizontalAlignment(com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER);
+        pieChartCategory.getLegend().setVerticalAlignment(com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.BOTTOM);
+        pieChartCategory.getLegend().setOrientation(com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL);
     }
 
     private void setupLineChart() {
@@ -268,6 +271,7 @@ public class StatisticsActivity extends AppCompatActivity {
         PieDataSet dataSet = new PieDataSet(entries, getString(R.string.statistics_expense_categories));
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
+        dataSet.setDrawValues(false);
 
         ArrayList<Integer> colors = new ArrayList<>();
         for (int c : ColorTemplate.VORDIPLOM_COLORS) colors.add(c);
@@ -276,7 +280,7 @@ public class StatisticsActivity extends AppCompatActivity {
 
         PieData data = new PieData(dataSet);
         data.setValueFormatter(new PercentFormatter(pieChartCategory));
-        data.setValueTextSize(11f);
+        data.setValueTextSize(0f);
         data.setValueTextColor(Color.BLACK);
         
         pieChartCategory.setData(data);

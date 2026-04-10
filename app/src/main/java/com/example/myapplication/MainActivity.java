@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
@@ -25,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TransactionActionsBottomSheet.TransactionActionsListener {
     private static final int PREVIEW_LIMIT = 3;
 
     TextView tvIncome, tvExpense, tvBalance;
@@ -196,6 +197,12 @@ public class MainActivity extends AppCompatActivity {
             amountView.setText(amountLabel);
             amountView.setTextColor(getColor(isIncome ? R.color.accent_green : R.color.accent_red));
 
+            itemView.setOnLongClickListener(v -> {
+                TransactionActionsBottomSheet bottomSheet = TransactionActionsBottomSheet.newInstance(transaction);
+                bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+                return true;
+            });
+
             transactionListContainer.addView(itemView);
         }
 
@@ -284,5 +291,39 @@ public class MainActivity extends AppCompatActivity {
 
         barChart.animateY(800);
         barChart.invalidate();
+    }
+
+    @Override
+    public void onRequestDeleteTransaction(int transactionId) {
+        showDeleteConfirmation(transactionId);
+    }
+
+    public void showDeleteConfirmation(int transactionId) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc muốn xóa giao dịch này?")
+                .setPositiveButton("Xóa", (dialog, which) -> deleteTransaction(transactionId))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void deleteTransaction(int transactionId) {
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+        apiService.deleteTransaction(transactionId).enqueue(new Callback<okhttp3.ResponseBody>() {
+            @Override
+            public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
+                    updateDashboard(); // Refresh the dashboard
+                } else {
+                    Toast.makeText(MainActivity.this, "Lỗi khi xóa giao dịch", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

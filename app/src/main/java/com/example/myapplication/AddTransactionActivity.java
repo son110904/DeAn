@@ -21,6 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,6 +86,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         } else {
             btnDelete.setVisibility(View.GONE);
             selectTransactionType(true);
+            setDefaultDate();
         }
 
         btnNewIncome.setOnClickListener(v -> selectTransactionType(false));
@@ -120,6 +124,13 @@ public class AddTransactionActivity extends AppCompatActivity {
         btnSave.setText("Cập nhật");
         btnDelete.setVisibility(View.VISIBLE);
         setTitle("Sửa giao dịch");
+    }
+
+    private void setDefaultDate() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String currentDate = dateFormat.format(calendar.getTime());
+        edtDate.setText(currentDate);
     }
 
     private void setupBottomNav() {
@@ -184,7 +195,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 public void onResponse(Call<TransactionResponse> call, Response<TransactionResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(AddTransactionActivity.this, getString(R.string.toast_add_success), Toast.LENGTH_SHORT).show();
-                        finish();
+                        resetFormForNewTransaction();
                     }
                 }
                 @Override
@@ -193,6 +204,15 @@ public class AddTransactionActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void resetFormForNewTransaction() {
+        edtAmount.setText("");
+        edtNote.setText("");
+        setDefaultDate();
+        selectTransactionType(true);
+        spinnerCategory.setSelection(0);
+        edtAmount.requestFocus();
     }
 
     private void showDeleteConfirmation() {
