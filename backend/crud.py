@@ -215,6 +215,35 @@ def get_budgets_with_spending(db: Session, user_id: int):
     ]
 
 
+def get_budget_by_id(db: Session, budget_id: int, user_id: int):
+    return (
+        db.query(models.Budget)
+        .filter(models.Budget.id == budget_id, models.Budget.user_id == user_id)
+        .first()
+    )
+
+
+def update_budget(db: Session, budget_id: int, payload: schemas.BudgetCreate, user_id: int):
+    budget = get_budget_by_id(db, budget_id, user_id)
+    if not budget:
+        return None
+
+    budget.category = payload.category
+    budget.limit_amount = payload.limit_amount
+    db.commit()
+    db.refresh(budget)
+    return budget
+
+
+def delete_budget(db: Session, budget_id: int, user_id: int):
+    budget = get_budget_by_id(db, budget_id, user_id)
+    if not budget:
+        return False
+    db.delete(budget)
+    db.commit()
+    return True
+
+
 def analyze_qr_content(content: str):
     text = (content or "").strip()
     amount = 0

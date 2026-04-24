@@ -15,16 +15,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngân sách chi tiêu"
+            android:text="@string/budget_title"
             android:textColor="@color/text_primary"
-            android:textSize="28sp"
+            android:textSize="30sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Thiết lập hạn mức chi tiêu cho từng danh mục"
+            android:text="@string/budget_subtitle"
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
@@ -33,7 +33,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="24dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp" />
 
         <Button
             android:id="@+id/btnAddBudget"
@@ -41,7 +43,7 @@
             android:layout_height="54dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_button_primary"
-            android:text="Thêm ngân sách"
+            android:text="@string/budget_add_button"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -54,8 +56,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/card_background"
-        android:elevation="8dp"
-        app:itemIconTint="@color/primary_blue"
-        app:itemTextColor="@color/text_secondary"
+        android:elevation="6dp"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemTextColor="@color/bottom_nav_item"
         app:menu="@menu/bottom_menu" />
 </RelativeLayout>

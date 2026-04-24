@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="?android:attr/windowBackground">
+    android:background="@color/card_background"
+    android:padding="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chọn hành động"
+        android:text="@string/action_select_title"
+        android:textColor="@color/text_primary"
         android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -18,26 +20,36 @@
     <Button
         android:id="@+id/btnEdit"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Chỉnh sửa"
+        android:layout_height="48dp"
+        android:text="@string/action_edit"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="?attr/colorPrimary"
-        android:textColor="?android:attr/textColorPrimaryInverse" />
+        android:background="@drawable/bg_button_primary"
+        android:backgroundTint="@null"
+        app:backgroundTint="@null"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/btnDelete"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Xóa"
+        android:layout_height="48dp"
+        android:text="@string/action_delete"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="?attr/colorError"
-        android:textColor="?android:attr/textColorPrimaryInverse" />
+        android:background="@drawable/bg_button_danger"
+        android:backgroundTint="@null"
+        app:backgroundTint="@null"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/btnCancel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hủy"
-        android:backgroundTint="?android:attr/colorButtonNormal" />
+        android:layout_height="48dp"
+        android:text="@string/scanner_cancel"
+        android:background="@drawable/bg_button_secondary"
+        android:backgroundTint="@null"
+        app:backgroundTint="@null"
+        android:textAllCaps="false"
+        android:textColor="@color/text_primary" />
 
 </LinearLayout>

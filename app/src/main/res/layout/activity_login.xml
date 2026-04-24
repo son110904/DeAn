@@ -8,9 +8,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="vertical"
         android:padding="32dp"
-        android:gravity="center">
+        android:paddingBottom="40dp">
 
         <!-- Logo/Icon placeholder -->
         <ImageView
@@ -43,9 +44,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="36dp"
             android:background="@drawable/bg_card"
-            android:elevation="2dp"
+            android:elevation="1dp"
             android:orientation="vertical"
             android:padding="24dp">
 
@@ -96,7 +97,7 @@
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/bg_button_primary"
                 android:text="@string/login_button"
                 android:textAllCaps="false"

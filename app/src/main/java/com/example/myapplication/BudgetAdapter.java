@@ -17,10 +17,20 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
 
     private final List<BudgetResponse> budgetList;
     private final Context context;
+    private final OnBudgetClickListener clickListener;
+
+    public interface OnBudgetClickListener {
+        void onBudgetClick(BudgetResponse budget);
+    }
 
     public BudgetAdapter(Context context, List<BudgetResponse> budgetList) {
+        this(context, budgetList, null);
+    }
+
+    public BudgetAdapter(Context context, List<BudgetResponse> budgetList, OnBudgetClickListener clickListener) {
         this.context = context;
         this.budgetList = budgetList;
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -56,6 +66,12 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
             holder.pbBudget.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.progress_budget));
             holder.tvWarning.setVisibility(View.GONE);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onBudgetClick(budget);
+            }
+        });
     }
 
     @Override

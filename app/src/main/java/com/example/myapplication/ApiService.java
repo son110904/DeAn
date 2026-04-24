@@ -46,6 +46,12 @@ public interface ApiService {
     @POST("budgets")
     Call<ResponseBody> saveBudget(@Body BudgetResponse budget);
 
+    @PUT("budgets/{id}")
+    Call<BudgetResponse> updateBudget(@Path("id") int id, @Body BudgetResponse budget);
+
+    @DELETE("budgets/{id}")
+    Call<ResponseBody> deleteBudget(@Path("id") int id);
+
     // QR Scanning - analyze QR content if needed
     @POST("qr/analyze")
     Call<TransactionRequest> analyzeQr(@Body String qrContent);

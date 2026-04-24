@@ -4,14 +4,17 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -24,14 +27,18 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -163,9 +170,84 @@ public class StatisticsActivity extends AppCompatActivity {
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
             }
         });
+        spinnerMonthYear.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                showMonthYearPicker();
+            }
+            return true;
+        });
         String initialMonth = monthKeys.get(0);
         updateBudgetByMonth(initialMonth);
         fetchDailySummary(resolveDailySummaryMonth(initialMonth));
+    }
+
+    private void showMonthYearPicker() {
+        Calendar cal = Calendar.getInstance();
+        int initialYear = cal.get(Calendar.YEAR);
+        int initialMonth = cal.get(Calendar.MONTH) + 1; // 1..12
+
+        Object selectedItem = spinnerMonthYear.getSelectedItem();
+        if (selectedItem instanceof String) {
+            String selected = (String) selectedItem;
+            if (selected.matches("\\d{4}-\\d{2}")) {
+                try {
+                    initialYear = Integer.parseInt(selected.substring(0, 4));
+                    initialMonth = Integer.parseInt(selected.substring(5, 7));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        NumberPicker monthPicker = new NumberPicker(this);
+        monthPicker.setMinValue(1);
+        monthPicker.setMaxValue(12);
+        monthPicker.setValue(Math.min(12, Math.max(1, initialMonth)));
+
+        NumberPicker yearPicker = new NumberPicker(this);
+        yearPicker.setMinValue(2000);
+        yearPicker.setMaxValue(2100);
+        yearPicker.setValue(initialYear);
+
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.HORIZONTAL);
+        int pad = dpToPx(16);
+        container.setPadding(pad, pad, pad, pad);
+        container.addView(monthPicker, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        container.addView(yearPicker, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.statistics_select_month_year))
+                .setView(container)
+                .setPositiveButton(android.R.string.ok, (d, which) -> {
+                    String monthKey = String.format(Locale.US, "%04d-%02d", yearPicker.getValue(), monthPicker.getValue());
+                    applySelectedMonth(monthKey);
+                })
+                .setNeutralButton(getString(R.string.statistics_all_months), (d, which) -> applySelectedMonth(getString(R.string.statistics_all_months)))
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void applySelectedMonth(String monthKey) {
+        if (monthKey == null || monthKey.isEmpty()) return;
+
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerMonthYear.getAdapter();
+        if (adapter == null) return;
+
+        int index = monthKeys.indexOf(monthKey);
+        if (index < 0) {
+            int insertAt = 0;
+            String allLabel = getString(R.string.statistics_all_months);
+            if (!monthKeys.isEmpty() && allLabel.equals(monthKeys.get(0))) {
+                insertAt = 1;
+            }
+            monthKeys.add(insertAt, monthKey);
+            adapter.notifyDataSetChanged();
+            index = insertAt;
+        }
+
+        spinnerMonthYear.setSelection(index);
+        updateBudgetByMonth(monthKey);
+        fetchDailySummary(resolveDailySummaryMonth(monthKey));
     }
 
     private void updateBudgetByMonth(String monthKey) {
@@ -227,6 +309,7 @@ public class StatisticsActivity extends AppCompatActivity {
         pieChartCategory.setTransparentCircleAlpha(110);
         pieChartCategory.setHoleRadius(58f);
         pieChartCategory.setTransparentCircleRadius(61f);
+        pieChartCategory.setDrawEntryLabels(false);
         pieChartCategory.setDrawCenterText(false);
         pieChartCategory.setRotationAngle(0);
         pieChartCategory.setRotationEnabled(true);
@@ -241,8 +324,18 @@ public class StatisticsActivity extends AppCompatActivity {
     private void setupLineChart() {
         lineChartDaily.getDescription().setEnabled(false);
         lineChartDaily.setDrawGridBackground(false);
-        lineChartDaily.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChartDaily.getXAxis().setDrawGridLines(false);
+        XAxis xAxis = lineChartDaily.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setGranularityEnabled(true);
+
+        lineChartDaily.getAxisLeft().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return TransactionStore.formatCurrency((long) value);
+            }
+        });
         lineChartDaily.getAxisRight().setEnabled(false);
     }
 
@@ -256,8 +349,8 @@ public class StatisticsActivity extends AppCompatActivity {
             pieChartCategory.invalidate();
             return;
         }
-
-        pieChartCategory.setCenterText(getString(R.string.statistics_expense_chart_center_text, TransactionStore.formatCurrency(expenseTotal)));
+        pieChartCategory.setDrawCenterText(false);
+        pieChartCategory.setCenterText("");
 
         List<Map.Entry<String, Long>> sortedEntries = new ArrayList<>(categoryTotals.entrySet());
         sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
@@ -268,7 +361,7 @@ public class StatisticsActivity extends AppCompatActivity {
             }
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, getString(R.string.statistics_expense_categories));
+        PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
         dataSet.setDrawValues(false);
@@ -312,10 +405,37 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void renderLineChart(List<DailySpendingResponse> dailyData) {
-        ArrayList<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < dailyData.size(); i++) {
-            entries.add(new Entry(i + 1, dailyData.get(i).getAmount()));
+        if (dailyData == null || dailyData.isEmpty()) {
+            lineChartDaily.clear();
+            lineChartDaily.setNoDataText(getString(R.string.chart_no_data));
+            lineChartDaily.invalidate();
+            return;
         }
+
+        List<DailySpendingResponse> sorted = new ArrayList<>(dailyData);
+        sorted.sort(Comparator.comparing(DailySpendingResponse::getDate));
+
+        ArrayList<Entry> entries = new ArrayList<>();
+        int maxDay = 1;
+        for (DailySpendingResponse item : sorted) {
+            int day = extractDayOfMonth(item.getDate());
+            if (day <= 0) continue;
+            maxDay = Math.max(maxDay, day);
+            entries.add(new Entry(day, item.getAmount()));
+        }
+
+        XAxis xAxis = lineChartDaily.getXAxis();
+        xAxis.setAxisMinimum(1f);
+        xAxis.setAxisMaximum((float) maxDay);
+        xAxis.setLabelCount(Math.min(Math.max(maxDay, 2), 7), false);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                int day = Math.round(value);
+                return String.valueOf(day);
+            }
+        });
+
         LineDataSet dataSet = new LineDataSet(entries, "Chi tiêu theo ngày");
         dataSet.setColor(ContextCompat.getColor(this, R.color.primary_blue));
         dataSet.setLineWidth(2f);
@@ -325,6 +445,19 @@ public class StatisticsActivity extends AppCompatActivity {
         LineData data = new LineData(dataSet);
         lineChartDaily.setData(data);
         lineChartDaily.invalidate();
+    }
+
+    private int extractDayOfMonth(String date) {
+        if (date == null || date.isEmpty()) return -1;
+        try {
+            String d = date.split("T")[0];
+            String[] parts = d.split("-");
+            if (parts.length >= 3) {
+                return Integer.parseInt(parts[2]);
+            }
+        } catch (Exception ignored) {
+        }
+        return -1;
     }
 
     private void renderTopTransactions(List<TransactionResponse> transactions) {

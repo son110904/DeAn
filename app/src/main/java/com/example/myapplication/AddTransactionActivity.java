@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -21,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -50,7 +50,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     RadioButton rbCash;
     EditText edtNote;
     EditText edtDate;
-    ImageButton btnScanQR;
+    View btnScanQR;
 
     boolean isExpense = true;
     private boolean isEditMode = false;
@@ -181,6 +181,9 @@ public class AddTransactionActivity extends AppCompatActivity {
                 public void onResponse(Call<TransactionResponse> call, Response<TransactionResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(AddTransactionActivity.this, "Đã cập nhật giao dịch", Toast.LENGTH_SHORT).show();
+                        if (isExpense) {
+                            maybeShowOverBudgetWarning(requestCategory);
+                        }
                         finish();
                     }
                 }
@@ -195,6 +198,9 @@ public class AddTransactionActivity extends AppCompatActivity {
                 public void onResponse(Call<TransactionResponse> call, Response<TransactionResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(AddTransactionActivity.this, getString(R.string.toast_add_success), Toast.LENGTH_SHORT).show();
+                        if (isExpense) {
+                            maybeShowOverBudgetWarning(requestCategory);
+                        }
                         resetFormForNewTransaction();
                     }
                 }
@@ -204,6 +210,47 @@ public class AddTransactionActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void maybeShowOverBudgetWarning(String categoryLabel) {
+        if (categoryLabel == null || categoryLabel.trim().isEmpty()) return;
+
+        ApiService apiService = RetrofitClient.getInstance(this).create(ApiService.class);
+        apiService.getBudgets().enqueue(new Callback<List<BudgetResponse>>() {
+            @Override
+            public void onResponse(Call<List<BudgetResponse>> call, Response<List<BudgetResponse>> response) {
+                if (!response.isSuccessful() || response.body() == null) return;
+
+                String txCategoryKey = TransactionStore.normalizeCategory(AddTransactionActivity.this, categoryLabel);
+                for (BudgetResponse budget : response.body()) {
+                    if (budget == null) continue;
+                    String budgetKey = TransactionStore.normalizeCategory(AddTransactionActivity.this, budget.getCategory());
+                    if (!txCategoryKey.equalsIgnoreCase(budgetKey)) continue;
+
+                    if (budget.getLimitAmount() > 0 && budget.getCurrentSpent() > budget.getLimitAmount()) {
+                        showOverBudgetDialog(budget.getCategory());
+                    }
+                    break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<BudgetResponse>> call, Throwable t) {
+                // Ignore warning when offline
+            }
+        });
+    }
+
+    private void showOverBudgetDialog(String categoryLabel) {
+        if (isFinishing() || isDestroyed()) return;
+        String category = (categoryLabel == null || categoryLabel.trim().isEmpty())
+                ? getString(R.string.transaction_unknown_category)
+                : categoryLabel.trim();
+        new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.budget_over_spent_message_with_category, category))
+                .setPositiveButton(getString(R.string.action_dismiss), (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 
     private void resetFormForNewTransaction() {

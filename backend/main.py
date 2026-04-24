@@ -139,6 +139,41 @@ def save_budget(
     return {"id": budget.id}
 
 
+@app.put("/budgets/{budget_id}", response_model=schemas.BudgetRead)
+def update_budget(
+    budget_id: int,
+    payload: schemas.BudgetCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    try:
+        budget = crud.update_budget(db, budget_id, payload, user_id=current_user.id)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Budget category already exists")
+
+    if not budget:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Budget not found")
+    # Return with current_spent computed
+    budgets = crud.get_budgets_with_spending(db, user_id=current_user.id)
+    for item in budgets:
+        if item.id == budget.id:
+            return item
+    return schemas.BudgetRead(id=budget.id, category=budget.category, limit_amount=budget.limit_amount, current_spent=0)
+
+
+@app.delete("/budgets/{budget_id}")
+def delete_budget(
+    budget_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    deleted = crud.delete_budget(db, budget_id, user_id=current_user.id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Budget not found")
+    return {"ok": True}
+
+
 @app.post("/qr/analyze", response_model=schemas.TransactionCreate)
 def analyze_qr(
     payload: str = Body(default="", embed=False),
