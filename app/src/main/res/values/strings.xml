@@ -163,7 +163,7 @@
     <string name="budget_dialog_limit">Hạn mức chi tiêu</string>
     <string name="budget_dialog_save">Lưu ngân sách</string>
 
-    <string name="budget_over_spent_message_with_category">đã chi quá tay cho %1$s</string>
+    <string name="budget_over_spent_message_with_category">Đã chi quá tay cho %1$s</string>
     <string name="action_dismiss">Tắt</string>
 
     <string name="scanner_title">Quét mã QR giao dịch</string>
